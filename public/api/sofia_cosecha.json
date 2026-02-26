@@ -1,0 +1,82 @@
+[
+    {
+        "fecha": "2026-01-10",
+        "labor": "cosecha kg 1",
+        "finca": "El Espejo",
+        "clasifica": "EEIII",
+        "cuartel": "001 - Ha:0.000, Pl:0",
+        "rendimiento": "304070.00",
+        "variedad": "Fiesta",
+        "ciclo": "2025-2026"
+    },
+    {
+        "fecha": "2026-01-12",
+        "labor": "cosecha kg 2",
+        "finca": "El Espejo",
+        "clasifica": "EEII",
+        "cuartel": "22 - Ha:2.800, Pl:4692",
+        "rendimiento": "192910.00",
+        "variedad": "Flame",
+        "ciclo": "2025-2026"
+    },
+    {
+        "fecha": "2026-01-15",
+        "labor": "cosecha kg 1",
+        "finca": "Fincas Viejas",
+        "clasifica": "Camino Truncado",
+        "cuartel": "22 - Ha:2.600, Pl:4205",
+        "rendimiento": "190880.00",
+        "variedad": "Fiesta",
+        "ciclo": "2025-2026"
+    },
+    {
+        "fecha": "2026-01-18",
+        "labor": "cosecha kg 3",
+        "finca": "Fincas Viejas",
+        "clasifica": "La Chimbera",
+        "cuartel": "10 - Ha:5.540, Pl:12052",
+        "rendimiento": "180640.00",
+        "variedad": "Selma",
+        "ciclo": "2025-2026"
+    },
+    {
+        "fecha": "2026-01-20",
+        "labor": "cosecha kg 5",
+        "finca": "El Espejo",
+        "clasifica": "EEI",
+        "cuartel": "003 - Ha:0.000, Pl:0",
+        "rendimiento": "143360.00",
+        "variedad": "Flame",
+        "ciclo": "2025-2026"
+    },
+    {
+        "fecha": "2026-01-22",
+        "labor": "cosecha kg 4",
+        "finca": "Fincas Viejas",
+        "clasifica": "Leiva",
+        "cuartel": "35 - Ha:4.320, Pl:0",
+        "rendimiento": "134820.00",
+        "variedad": "Fiesta",
+        "ciclo": "2025-2026"
+    },
+    {
+        "fecha": "2026-01-25",
+        "labor": "cosecha kg 1",
+        "finca": "Fincas Viejas",
+        "clasifica": "Puente Alto",
+        "cuartel": "53 - Ha:2.200, Pl:3617",
+        "rendimiento": "128740.00",
+        "variedad": "Fiesta",
+        "ciclo": "2025-2026"
+    },
+    {
+        "fecha": "2025-01-10",
+        "labor": "cosecha kg 1",
+        "finca": "El Espejo",
+        "clasifica": "EEI",
+        "cuartel": "001 - Ha:0.000, Pl:0",
+        "rendimiento": "285000.00",
+        "variedad": "Sultanina",
+        "ciclo": "2024-2025"
+    }
+]

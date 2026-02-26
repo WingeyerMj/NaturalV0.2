@@ -1,0 +1,2686 @@
+@import url(https://fonts.googleapis.com/css?family=Lato:300,400);
+
+.new-landing-wrapper header,
+.new-landing-wrapper header nav ul li ul {
+    border-bottom: rgba(244, 176, 57, .9) .5em solid;
+    width: 100%
+}
+
+.new-landing-wrapper * {
+    margin: 0;
+    padding: 0
+}
+
+.new-landing-wrapper {
+    height: 100%
+}
+
+.new-landing-wrapper {
+    font-family: Lato;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    height: 100%
+}
+
+.new-landing-wrapper ::selection {
+    background: rgba(255, 255, 255, .5)
+}
+
+.new-landing-wrapper ::-moz-selection {
+    background: rgba(255, 255, 255, .5)
+}
+
+.new-landing-wrapper header {
+    background: rgba(95, 43, 115, 1);
+    font-size: .9em;
+    height: 5.5em;
+    position: fixed;
+    z-index: 1
+}
+
+.new-landing-wrapper header:hover {
+    background: rgba(95, 43, 115, 1) !important;
+    border-bottom: rgba(244, 176, 57, .9) .5em solid !important
+}
+
+.new-landing-wrapper header a {
+    text-decoration: none;
+    color: rgba(255, 255, 255, .95)
+}
+
+.new-landing-wrapper header a figure {
+    float: left;
+    width: 40%;
+    margin: 0;
+    box-sizing: border-box;
+    padding: .5% 5%
+}
+
+.new-landing-wrapper header a figure img {
+    max-width: 100%;
+    height: auto
+}
+
+.new-landing-wrapper header nav {
+    float: left;
+    width: 60%;
+    box-sizing: border-box;
+    padding: 0 5% 0 0;
+    font-size: .9em
+}
+
+.new-landing-wrapper header nav ul {
+    list-style: none
+}
+
+.new-landing-wrapper header nav ul li {
+    float: left;
+    width: 16.666666667%;
+    position: relative;
+    text-align: center;
+    transition: all .2s ease-in-out
+}
+
+.new-landing-wrapper header nav ul li.current-menu-item,
+.new-landing-wrapper header nav ul li:hover {
+    background-color: rgba(255, 255, 255, .1)
+}
+
+.new-landing-wrapper header nav ul li:hover>ul.sub-menu {
+    display: block
+}
+
+.new-landing-wrapper header nav ul li a {
+    display: block;
+    width: 100%;
+    padding: 3em 0 2em
+}
+
+.new-landing-wrapper header nav ul li ul {
+    position: absolute;
+    background: rgba(80, 36, 97, 1);
+    margin-top: -.2em;
+    border-radius: 0 0 .25em .25em;
+    display: none
+}
+
+.new-landing-wrapper header nav ul li ul li {
+    display: block;
+    width: 100%;
+    border-bottom: 1px solid rgba(255, 255, 255, .1)
+}
+
+.new-landing-wrapper header nav ul li ul li a {
+    display: block;
+    width: 100%;
+    padding: .7em 0;
+    box-sizing: border-box;
+    color: rgba(255, 255, 255, .9)
+}
+
+.new-landing-wrapper header nav ul li ul li ul {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    margin: 0;
+    border-left: rgba(244, 176, 57, .9) .5em solid;
+    border-bottom: none;
+    border-radius: 0 .25em .25em 0;
+    display: none
+}
+
+.new-landing-wrapper header nav ul li ul li:hover>ul {
+    display: block
+}
+
+.new-landing-wrapper div#portapdf,
+.new-landing-wrapper header span#btnMenu {
+    display: none
+}
+
+.new-landing-wrapper main {
+    height: 100%;
+    font-size: 15px
+}
+
+.new-landing-wrapper main section#sliderPrincipal {
+    width: 100%;
+    height: 100%
+}
+
+.new-landing-wrapper main section#sliderPrincipal div {
+    display: block;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    z-index: -1;
+    overflow: hidden;
+    height: 100%
+}
+
+.new-landing-wrapper main section#sliderPrincipal div video {
+    width: 100%
+}
+
+.new-landing-wrapper main section#sliderPrincipal span.triangulo {
+    width: 0;
+    height: 0;
+    border-left: 1em solid transparent;
+    border-right: 1em solid transparent;
+    border-top: 1.6em solid rgba(255, 255, 255, .65);
+    margin: 0 auto;
+    display: block;
+    position: absolute;
+    bottom: 2%;
+    left: 50%;
+    transition: all .3s ease-in-out;
+    animation-name: upDown;
+    animation-duration: 2s;
+    animation-timing-function: ease;
+    animation-delay: 8s;
+    animation-iteration-count: infinite;
+    opacity: 0
+}
+
+@keyframes upDown {
+    0% {
+        opacity: 1;
+        transform: translateY(.1em)
+    }
+
+    1% {
+        opacity: 1
+    }
+
+    20% {
+        transform: translateY(.5em)
+    }
+
+    100% {
+        transform: translateY(.1em);
+        opacity: 1
+    }
+}
+
+.new-landing-wrapper main section#traz-producto {
+    background: url(https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/vertically-integrated/fondo-vertically-integrated.jpg) fixed;
+    background-size: cover;
+    padding: 3% 10%;
+    overflow: hidden;
+    text-align: center
+}
+
+.new-landing-wrapper main section#traz-producto h2 {
+    font-size: 2.4em;
+    color: rgba(255, 255, 255, 1);
+    margin: 3% auto;
+    text-align: center;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, .6);
+    background-color: rgba(0, 0, 0, 0);
+    border: 0
+}
+
+.new-landing-wrapper main section#traz-producto figure.img-vertically-integrated,
+.new-landing-wrapper main section#traz-producto p.text-vertically-integrated {
+    display: inline-block;
+    margin: 0;
+    vertical-align: middle
+}
+
+.new-landing-wrapper main section#traz-producto figure.img-vertically-integrated {
+    border-radius: 100%;
+    overflow: hidden;
+    width: 20vw;
+    height: 20vw;
+    border: .5em solid rgba(95, 43, 115, 1);
+    box-shadow: 2px 2px 5px 3px rgba(0, 0, 0, .5)
+}
+
+.new-landing-wrapper main section#traz-producto figure.img-doble {
+    margin-right: 15%
+}
+
+.new-landing-wrapper main section#traz-producto figure.img-vertically-integrated img {
+    width: 180%;
+    max-width: 180%;
+    transform: translateX(-25%)
+}
+
+.new-landing-wrapper main section#traz-producto p.text-vertically-integrated {
+    font-size: 1.2em;
+    line-height: 1.4em;
+    color: rgba(255, 255, 255, 1);
+    padding: 2% 4% 4%;
+    margin: 0 auto;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, .6)
+}
+
+.new-landing-wrapper main section#traz-producto p.p-left {
+    margin: 0 0 0 5%
+}
+
+.new-landing-wrapper main section#traz-producto p.p-right {
+    margin: 0 5% 0 0
+}
+
+.new-landing-wrapper main section#traz-producto p.p-center {
+    margin: 5% auto;
+    text-align: center;
+    width: 65%;
+    display: block
+}
+
+.new-landing-wrapper main section h2 {
+    background-color: rgba(0, 0, 0, .05);
+    padding: 2%;
+    box-sizing: border-box;
+    color: rgba(0, 0, 0, .6);
+    font-weight: 400;
+    text-align: center;
+    border-top: 1px solid rgba(0, 0, 0, .06)
+}
+
+.new-landing-wrapper main section div.section-container {
+    box-sizing: border-box;
+    padding: 2% 0;
+    text-align: center
+}
+
+.new-landing-wrapper main section#page-about-us header,
+.new-landing-wrapper main section#page-our-farms header {
+    padding-top: 7em;
+    overflow: hidden;
+    z-index: -1;
+    position: relative;
+    border: 0;
+    box-sizing: border-box
+}
+
+.new-landing-wrapper main section#page-our-farms div#secadoTrad p,
+.new-landing-wrapper main section#page-our-process p {
+    padding: 2% 4% 4%;
+    border-bottom: .3em solid rgba(229, 163, 62, 1)
+}
+
+.new-landing-wrapper main section div.section-container video {
+    width: 60%
+}
+
+.new-landing-wrapper main section#quality-certif {
+    background-color: rgba(0, 0, 0, .03);
+    border-top: 1px solid rgba(0, 0, 0, .06);
+    clear: both
+}
+
+.new-landing-wrapper main section#quality-certif div.section-container span.logo-certificado {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6%;
+    width: 7%;
+    box-sizing: border-box
+}
+
+.new-landing-wrapper main section#quality-certif div.section-container span.logo-certificado:first-child {
+    margin-left: 6%
+}
+
+.new-landing-wrapper main section#quality-certif div.section-container span.logo-certificado img {
+    opacity: .3;
+    filter: grayscale(1);
+    width: 100%;
+    height: auto;
+    transition: all .2s ease-in-out
+}
+
+.new-landing-wrapper main section#quality-certif div.section-container span.logo-certificado img:hover {
+    opacity: .75;
+    filter: grayscale(0)
+}
+
+.new-landing-wrapper main section#page-about-us,
+.new-landing-wrapper main section#page-our-farms {
+    padding: 5.4em 0 0;
+    box-sizing: border-box
+}
+
+.new-landing-wrapper main section#page-our-farms header {
+    height: 100vh;
+    background: url(https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/header-our-farms.jpg) center 75% no-repeat fixed
+}
+
+.new-landing-wrapper main section#page-about-us header {
+    height: 100vh;
+    background: url(https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/header-about-us.jpg) center 0 no-repeat fixed
+}
+
+.new-landing-wrapper main section#page-about-us header h1,
+.new-landing-wrapper main section#page-our-farms header h1,
+.new-landing-wrapper main section#page-our-process h1 {
+    font-size: 2.4em;
+    color: rgba(255, 255, 255, 1);
+    margin: 3% auto;
+    text-align: center
+}
+
+.new-landing-wrapper main section#page-about-us header p,
+.new-landing-wrapper main section#page-our-farms header p {
+    font-size: 1.2em;
+    line-height: 1.4em;
+    color: rgba(255, 255, 255, 1);
+    width: 60%;
+    padding: 2% 4% 8%;
+    border-bottom: .3em solid rgba(229, 163, 62, 1);
+    margin: 0 auto;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, .6)
+}
+
+.new-landing-wrapper main section#page-about-us div#visYmis {
+    box-sizing: border-box;
+    padding: 0 0 1%;
+    font-size: .9em;
+    text-align: center;
+    background: url(https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/header-about-us.jpg) center 0 no-repeat fixed
+}
+
+.new-landing-wrapper main section#page-about-us div#visYmis h2 {
+    background-color: rgba(0, 0, 0, 0);
+    margin: 0 auto 3%;
+    box-sizing: border-box;
+    color: rgba(255, 255, 255, 1);
+    font-weight: 800;
+    font-size: 1.4em;
+    text-align: center;
+    border-top: none;
+    padding: 0
+}
+
+.new-landing-wrapper main section#page-about-us div#visYmis p {
+    padding-bottom: 2%;
+    margin: 0 auto 3%;
+    width: 50%;
+    color: rgba(255, 255, 255, 1);
+    font-size: 1.2em;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, .6)
+}
+
+.new-landing-wrapper main section#page-about-us div#values {
+    overflow: hidden;
+    z-index: -1;
+    position: relative;
+    border: 0;
+    background: url(https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/fondo-valores.jpg) center no-repeat fixed;
+    padding: 5% 15%
+}
+
+.new-landing-wrapper main section#page-about-us div#values h2 {
+    font-size: 1em;
+    color: rgba(255, 255, 255, .8);
+    margin: 2% auto 5%;
+    text-align: center;
+    width: 15%;
+    padding: 1.5% 0;
+    background-color: rgba(95, 43, 115, .8);
+    font-weight: 600
+}
+
+.new-landing-wrapper main section#page-about-us div#values ul {
+    margin: 5% 0
+}
+
+.new-landing-wrapper main section#page-about-us div#values ul li {
+    display: inline-block;
+    width: 30%;
+    vertical-align: top;
+    font-size: .9em;
+    background-color: rgba(255, 255, 255, .8);
+    padding: 2%;
+    box-sizing: border-box;
+    text-align: center;
+    border-bottom: rgba(244, 176, 57, .9) .5em solid;
+    border-radius: 1.25em
+}
+
+.new-landing-wrapper main section#page-our-farms div#secadoDOV,
+.new-landing-wrapper main section#page-our-farms div#secadoTrad {
+    border: 0;
+    padding: 2% 15% 0;
+    background: url(https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/fondo-secado-tradicional.jpg) center no-repeat fixed;
+    text-align: center;
+    box-sizing: border-box;
+    z-index: -1;
+    position: relative;
+    overflow: hidden
+}
+
+.new-landing-wrapper main section#page-about-us div#values ul li:nth-child(2),
+.new-landing-wrapper main section#page-products ul li:nth-child(2) {
+    margin: 0 4.5%
+}
+
+.new-landing-wrapper main section#page-about-us div#values ul li h3 {
+    font-size: 1em;
+    color: rgba(0, 0, 0, .7);
+    text-align: center;
+    margin-bottom: 3%
+}
+
+.new-landing-wrapper main section#page-about-us div#values ul li p {
+    color: rgba(0, 0, 0, .7)
+}
+
+.new-landing-wrapper main section#page-our-farms header h2,
+.new-landing-wrapper main section#page-our-process header h2 {
+    font-size: 1.6em;
+    color: rgba(255, 255, 255, 1);
+    margin: 3% auto;
+    text-align: center;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, .4);
+    background: 0 0;
+    padding: 0;
+    border: none
+}
+
+.new-landing-wrapper main section#page-our-farms div#secadoTrad h2 {
+    font-size: 1.6em;
+    color: rgba(255, 255, 255, 1);
+    text-align: center;
+    width: 100%;
+    padding: 5% 0 2%;
+    font-weight: 600;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, .6);
+    border: none;
+    background: 0 0
+}
+
+.new-landing-wrapper main section#page-our-farms div#secadoDOV h3,
+.new-landing-wrapper main section#page-our-farms div#secadoTrad h3 {
+    font-size: 1.2em;
+    color: rgba(255, 255, 255, 1);
+    margin: 1% auto 2%;
+    text-align: center;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, .4);
+    background: 0 0;
+    padding: 0;
+    border: none
+}
+
+.new-landing-wrapper main section#page-our-farms div#secadoDOV p,
+.new-landing-wrapper main section#page-our-farms div#secadoTrad p {
+    font-size: 1em;
+    text-align: left;
+    margin: 0 auto;
+    color: rgba(255, 255, 255, 1);
+    width: 100%;
+    line-height: 1.4em;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, .6)
+}
+
+.new-landing-wrapper main section#page-our-farms div#secadoDOV p {
+    padding: 2% 4%
+}
+
+.new-landing-wrapper main section#page-our-farms div#secadoDOV p:last-child {
+    border-bottom: .3em solid rgba(229, 163, 62, 1)
+}
+
+.new-landing-wrapper main section#page-our-farms div#secadoDOV ul {
+    font-size: .9em;
+    line-height: 1.6em;
+    color: rgba(0, 0, 0, .8);
+    width: 100%;
+    padding: 0;
+    margin: 0 auto;
+    list-style: none
+}
+
+.new-landing-wrapper main section#page-our-farms div#secadoDOV ul li {
+    background-color: rgba(95, 43, 115, .8);
+    color: rgba(255, 255, 255, .8);
+    width: 25%;
+    margin: 0 1% 1% auto;
+    padding: .5% 0;
+    display: inline-block;
+    font-size: 1em
+}
+
+.new-landing-wrapper main section#background-process {
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    top: 5em
+}
+
+.new-landing-wrapper main section#background-process div {
+    display: block;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    z-index: -1;
+    overflow: hidden;
+    height: 100%
+}
+
+.new-landing-wrapper main section#background-process div video {
+    width: 100%;
+    height: auto
+}
+
+.new-landing-wrapper main section#page-our-process {
+    padding: 6em 20% 2.4%;
+    box-sizing: border-box;
+    margin-bottom: 3%
+}
+
+.new-landing-wrapper main section#page-our-process header {
+    position: relative;
+    overflow: hidden;
+    z-index: -1;
+    background: rgba(95, 43, 115, 0);
+    border-bottom: rgba(244, 176, 57, .9) 0 solid;
+    height: auto;
+    padding-top: 2.5em
+}
+
+.new-landing-wrapper main section#page-our-process p {
+    font-size: 1.2em;
+    line-height: 1.4em;
+    color: rgba(255, 255, 255, 1);
+    width: 100%;
+    margin: 0 auto;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, .6)
+}
+
+.new-landing-wrapper main section#page-our-process>h2 {
+    font-size: 1.2em;
+    color: rgba(255, 255, 255, 1);
+    margin: 3% auto;
+    text-align: center;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, .4);
+    background: 0 0;
+    padding: 0;
+    border: none
+}
+
+.new-landing-wrapper main section#page-other-products header ul li em,
+.new-landing-wrapper main section#page-raisins header ul li em,
+.new-landing-wrapper main section#page-raisins-golden header ul li em,
+.new-landing-wrapper main section#page-raisins-organic header ul li em {
+    text-transform: uppercase;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, .3);
+    font-style: normal;
+    display: inline-block
+}
+
+.new-landing-wrapper main section#nutrition,
+.new-landing-wrapper main section#nutrition-golden,
+.new-landing-wrapper main section#nutrition-organic {
+    background-image: url(https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/fondo-nutricion-producto.jpg);
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat
+}
+
+.new-landing-wrapper main section#page-our-process ul {
+    margin-top: 3%;
+    list-style: none;
+    text-align: center
+}
+
+.new-landing-wrapper main section#page-our-process ul li {
+    display: inline-block;
+    font-size: .9em;
+    line-height: 1.6em;
+    color: rgba(255, 255, 255, .8);
+    background-color: rgba(95, 43, 115, .7);
+    padding: .5% 1%;
+    margin-bottom: 1.5%
+}
+
+.new-landing-wrapper main section#page-products {
+    padding: 9em 20% 3%;
+    box-sizing: border-box
+}
+
+.new-landing-wrapper main section#page-products h1 {
+    font-size: 1em;
+    color: rgba(255, 255, 255, .8);
+    margin: 0 auto 5%;
+    text-align: center;
+    width: 15%;
+    padding: 1.5% 2%;
+    background-color: rgba(95, 43, 115, .7)
+}
+
+.new-landing-wrapper main section#page-products ul {
+    margin: 5% auto
+}
+
+.new-landing-wrapper main section#page-products ul li {
+    font-size: .9em;
+    line-height: 1.6em;
+    color: rgba(0, 0, 0, .8);
+    display: inline-block;
+    width: 30%;
+    text-align: center;
+    background-color: rgba(0, 0, 0, .05);
+    padding: 5em 0
+}
+
+.new-landing-wrapper main section#page-raisins {
+    box-sizing: border-box;
+    display: block;
+    padding: 5.4em 0 0
+}
+
+.new-landing-wrapper main section#page-raisins header {
+    overflow: hidden;
+    height: 83vh;
+    z-index: -1;
+    position: relative;
+    background: 0 0;
+    border: 0
+}
+
+.new-landing-wrapper main section#page-raisins header h1 {
+    text-align: center;
+    font-size: 1.4em;
+    color: rgba(95, 43, 115, .8);
+    margin: 2.5% auto 2%;
+    background-color: rgba(245, 245, 245, .8);
+    padding: 0 0 .5%;
+    box-sizing: border-box;
+    width: 25%
+}
+
+.new-landing-wrapper main section#page-raisins header h1 div {
+    background: rgba(95, 43, 115, .8);
+    color: rgba(255, 255, 255, .8);
+    padding: 2%;
+    font-weight: 500;
+    font-size: .9em;
+    margin-bottom: 3%
+}
+
+.new-landing-wrapper main section#page-raisins header ul {
+    width: 80%;
+    margin: 0 auto 1%;
+    box-sizing: border-box;
+    list-style: none;
+    background: rgba(101, 101, 165, 0);
+    text-align: left;
+    color: rgba(255, 255, 255, .9);
+    font-size: .8em
+}
+
+.new-landing-wrapper main section#page-raisins header ul li {
+    display: block;
+    width: 40%;
+    margin: .5% auto;
+    padding: 0;
+    background-color: rgba(0, 0, 0, .6);
+    box-sizing: border-box;
+    vertical-align: middle
+}
+
+.new-landing-wrapper main section#page-raisins header ul li em {
+    background-color: rgba(155, 90, 181, .5);
+    padding: 1% 2%;
+    font-weight: 600;
+    font-size: 1.125em;
+    width: 25%;
+    text-align: center;
+    margin-right: 1.5%
+}
+
+.new-landing-wrapper main section#ship-pack {
+    background-color: rgba(0, 0, 0, .03);
+    padding: 3% 0
+}
+
+.new-landing-wrapper main section#ship-pack h2 {
+    background-color: rgba(95, 43, 115, .8);
+    padding: 1% 0;
+    box-sizing: border-box;
+    color: rgba(255, 255, 255, .8);
+    font-size: 1.2em;
+    text-align: center;
+    border: 0;
+    width: 25%;
+    margin: 0 auto 3%
+}
+
+.new-landing-wrapper main section#ship-pack figure {
+    margin: 0 auto 3% 10%;
+    width: 40%;
+    overflow: hidden;
+    float: left
+}
+
+.new-landing-wrapper main section#ship-pack figure img {
+    width: 100%
+}
+
+.new-landing-wrapper main section#ship-pack ul {
+    margin: 3.5% 0 0;
+    list-style: none;
+    text-align: center;
+    font-size: .9em;
+    float: left;
+    width: 50%;
+    box-sizing: border-box;
+    padding-right: 10%
+}
+
+.new-landing-wrapper main section#ship-pack ul li {
+    display: inline-block;
+    background: rgba(95, 43, 115, 1);
+    padding: 2% 3%;
+    border-radius: 1em;
+    color: rgba(255, 255, 255, .8);
+    margin: 0 0 5% 5%
+}
+
+.new-landing-wrapper main section#ship-pack div.table {
+    clear: both;
+    width: 60%;
+    margin: 0 auto;
+    padding: 0 0 1.5%;
+    box-sizing: border-box;
+    background-color: rgba(95, 43, 115, .9);
+    text-align: center;
+    border-radius: 2.5em;
+    font-size: .9em;
+    color: rgba(255, 255, 255, .8);
+    overflow: hidden
+}
+
+.new-landing-wrapper main section#ship-pack div.table div.tr {
+    width: 100%;
+    overflow: hidden;
+    padding: 1% 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .5)
+}
+
+.new-landing-wrapper main section#ship-pack div.table div.tr:nth-child(1),
+.new-landing-wrapper main section#ship-pack div.table div.tr:nth-child(5) {
+    background-color: rgba(0, 0, 0, .2)
+}
+
+.new-landing-wrapper main section#ship-pack div.table div.tr:nth-child(1) {
+    padding-top: 1.5%
+}
+
+.new-landing-wrapper main section#ship-pack div.table div.tr div.td,
+.new-landing-wrapper main section#ship-pack div.table div.tr div.th {
+    float: left;
+    width: 33%
+}
+
+.new-landing-wrapper main section#ship-pack div.table div.tr div.th {
+    font-weight: 600;
+    color: rgba(246, 188, 74, 1)
+}
+
+.new-landing-wrapper main section#nutrition div.table,
+.new-landing-wrapper main section#nutrition h2 {
+    text-align: center;
+    color: rgba(255, 255, 255, .8);
+    box-sizing: border-box
+}
+
+.new-landing-wrapper main section#ship-pack div.table div.tr div:nth-child(2) {
+    border-left: 1px solid rgba(255, 255, 255, .6)
+}
+
+.new-landing-wrapper main section#nutrition {
+    box-sizing: border-box;
+    padding: 3% 0
+}
+
+.new-landing-wrapper main section#nutrition h2 {
+    background-color: rgba(0, 0, 0, .7);
+    padding: 1% 0;
+    font-size: 1.2em;
+    border: 0;
+    width: 22%;
+    margin: 0 auto 3%
+}
+
+.new-landing-wrapper main section#nutrition div.table {
+    clear: both;
+    width: 30%;
+    margin: 0 auto;
+    padding: .2% 0;
+    background-color: rgba(95, 43, 115, .9);
+    border-radius: 2.5em;
+    font-size: .9em;
+    overflow: hidden
+}
+
+.new-landing-wrapper main section#nutrition div.table div.tr {
+    width: 100%;
+    overflow: hidden;
+    padding: 1.5% 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .5)
+}
+
+.new-landing-wrapper main section#nutrition div.table div.tr:last-child {
+    border-bottom: none
+}
+
+.new-landing-wrapper main section#nutrition div.table div.tr div.td,
+.new-landing-wrapper main section#nutrition div.table div.tr div.th {
+    float: left;
+    width: 49%
+}
+
+.new-landing-wrapper main section#nutrition div.table div.tr div.th {
+    font-weight: 600;
+    color: rgba(246, 188, 74, 1)
+}
+
+.new-landing-wrapper main section#nutrition div.table div.tr div:nth-child(2) {
+    border-left: 1px solid rgba(255, 255, 255, .6)
+}
+
+.new-landing-wrapper main section#nutrition div.table div.tr div:nth-child(1) {
+    box-sizing: border-box;
+    padding-left: 10%;
+    text-align: left
+}
+
+.new-landing-wrapper main section#page-raisins-organic {
+    box-sizing: border-box;
+    display: block;
+    padding: 5.4em 0 0
+}
+
+.new-landing-wrapper main section#page-raisins-organic header {
+    overflow: hidden;
+    height: 83vh;
+    z-index: -1;
+    position: relative;
+    border: 0;
+    background: url(https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/header-dark-raisins.jpg) center no-repeat fixed
+}
+
+.new-landing-wrapper main section#page-raisins-organic header h1 {
+    text-align: center;
+    font-size: 1.4em;
+    color: rgba(106, 175, 33, 1);
+    margin: 2.5% auto 2%;
+    background-color: rgba(245, 245, 245, .8);
+    padding: 0 0 .5%;
+    box-sizing: border-box;
+    width: 25%
+}
+
+.new-landing-wrapper main section#page-raisins-organic header h1 div {
+    background: rgba(106, 175, 33, .7);
+    color: rgba(255, 255, 255, .8);
+    padding: 2%;
+    font-weight: 500;
+    font-size: .9em;
+    margin-bottom: 3%
+}
+
+.new-landing-wrapper main section#page-raisins-organic header ul {
+    width: 80%;
+    margin: 0 auto 1%;
+    box-sizing: border-box;
+    list-style: none;
+    background: rgba(101, 101, 165, 0);
+    text-align: left;
+    color: rgba(255, 255, 255, .9);
+    font-size: .8em
+}
+
+.new-landing-wrapper main section#page-raisins-organic header ul li {
+    display: block;
+    width: 40%;
+    margin: .5% auto;
+    padding: 0;
+    background-color: rgba(0, 0, 0, .6);
+    box-sizing: border-box;
+    vertical-align: middle
+}
+
+.new-landing-wrapper main section#page-raisins-organic header ul li em {
+    background-color: rgba(106, 175, 33, .7);
+    padding: 1% 2%;
+    font-weight: 600;
+    font-size: 1.125em;
+    width: 25%;
+    text-align: center;
+    margin-right: 1.5%
+}
+
+.new-landing-wrapper main section#ship-pack-organic {
+    background-color: rgba(0, 0, 0, .03);
+    padding: 3% 0
+}
+
+.new-landing-wrapper main section#ship-pack-organic h2 {
+    background-color: rgba(106, 175, 33, 1);
+    padding: 1% 0;
+    box-sizing: border-box;
+    color: rgba(255, 255, 255, .8);
+    font-size: 1.2em;
+    text-align: center;
+    border: 0;
+    width: 25%;
+    margin: 0 auto 3%
+}
+
+.new-landing-wrapper main section#nutrition-organic div.table div.tr div:nth-child(2),
+.new-landing-wrapper main section#ship-pack-organic div.table div.tr div:nth-child(2) {
+    border-left: 1px solid rgba(255, 255, 255, .6)
+}
+
+.new-landing-wrapper main section#ship-pack-organic figure {
+    margin: 0 auto 3% 10%;
+    width: 40%;
+    overflow: hidden;
+    float: left
+}
+
+.new-landing-wrapper main section#ship-pack-organic figure img {
+    width: 100%
+}
+
+.new-landing-wrapper main section#ship-pack-organic ul {
+    margin: 3.5% 0 0;
+    list-style: none;
+    text-align: center;
+    font-size: .9em;
+    float: left;
+    width: 50%;
+    box-sizing: border-box;
+    padding-right: 10%
+}
+
+.new-landing-wrapper main section#ship-pack-organic ul li {
+    display: inline-block;
+    background: rgba(106, 175, 33, 1);
+    padding: 2% 3%;
+    border-radius: 1em;
+    color: rgba(255, 255, 255, .8);
+    margin: 0 0 5% 5%
+}
+
+.new-landing-wrapper main section#ship-pack-organic div.table {
+    clear: both;
+    width: 60%;
+    margin: 0 auto;
+    padding: 0 0 1.5%;
+    box-sizing: border-box;
+    background-color: rgba(106, 175, 33, .9);
+    text-align: center;
+    border-radius: 2.5em;
+    font-size: .9em;
+    color: rgba(255, 255, 255, .8);
+    overflow: hidden
+}
+
+.new-landing-wrapper main section#ship-pack-organic div.table div.tr {
+    width: 100%;
+    overflow: hidden;
+    padding: 1% 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .5)
+}
+
+.new-landing-wrapper main section#ship-pack-organic div.table div.tr:nth-child(1),
+.new-landing-wrapper main section#ship-pack-organic div.table div.tr:nth-child(5) {
+    background-color: rgba(0, 0, 0, .2)
+}
+
+.new-landing-wrapper main section#ship-pack-organic div.table div.tr:nth-child(1) {
+    padding-top: 1.5%
+}
+
+.new-landing-wrapper main section#ship-pack-organic div.table div.tr div.td,
+.new-landing-wrapper main section#ship-pack-organic div.table div.tr div.th {
+    float: left;
+    width: 33%
+}
+
+.new-landing-wrapper main section#ship-pack-organic div.table div.tr div.th {
+    font-weight: 600;
+    color: rgba(246, 188, 74, 1)
+}
+
+.new-landing-wrapper main section#nutrition-organic {
+    box-sizing: border-box;
+    padding: 3% 0
+}
+
+.new-landing-wrapper main section#nutrition-organic h2 {
+    background-color: rgba(0, 0, 0, .7);
+    padding: 1% 0;
+    box-sizing: border-box;
+    color: rgba(255, 255, 255, .8);
+    font-size: 1.2em;
+    text-align: center;
+    border: 0;
+    width: 22%;
+    margin: 0 auto 3%
+}
+
+.new-landing-wrapper main section#nutrition-organic div.table {
+    clear: both;
+    width: 30%;
+    margin: 0 auto;
+    padding: .2% 0;
+    box-sizing: border-box;
+    background-color: rgba(106, 175, 33, .9);
+    text-align: center;
+    border-radius: 2.5em;
+    font-size: .9em;
+    color: rgba(255, 255, 255, .8);
+    overflow: hidden
+}
+
+.new-landing-wrapper main section#nutrition-organic div.table div.tr {
+    width: 100%;
+    overflow: hidden;
+    padding: 1.5% 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .5)
+}
+
+.new-landing-wrapper main section#nutrition-organic div.table div.tr:last-child {
+    border-bottom: none
+}
+
+.new-landing-wrapper main section#nutrition-organic div.table div.tr div.td,
+.new-landing-wrapper main section#nutrition-organic div.table div.tr div.th {
+    float: left;
+    width: 49%
+}
+
+.new-landing-wrapper main section#nutrition-organic div.table div.tr div.th {
+    font-weight: 600;
+    color: rgba(246, 188, 74, 1)
+}
+
+.new-landing-wrapper main section#nutrition-organic div.table div.tr div:nth-child(1) {
+    box-sizing: border-box;
+    padding-left: 10%;
+    text-align: left
+}
+
+.new-landing-wrapper main section#page-raisins-golden {
+    box-sizing: border-box;
+    display: block;
+    padding: 5.4em 0 0
+}
+
+.new-landing-wrapper main section#page-raisins-golden header {
+    overflow: hidden;
+    height: 83vh;
+    z-index: -1;
+    position: relative;
+    background: 0 0;
+    border: 0
+}
+
+.new-landing-wrapper main section#page-raisins-golden header h1 {
+    text-align: center;
+    font-size: 1.4em;
+    color: rgba(95, 43, 115, .8);
+    margin: 2.5% auto 2%;
+    background-color: rgba(245, 245, 245, .8);
+    padding: 0 0 .5%;
+    box-sizing: border-box;
+    width: 25%
+}
+
+.new-landing-wrapper main section#page-raisins-golden header h1 div {
+    background: rgba(95, 43, 115, .8);
+    color: rgba(255, 255, 255, .8);
+    padding: 2%;
+    font-weight: 500;
+    font-size: .9em;
+    margin-bottom: 3%
+}
+
+.new-landing-wrapper main section#page-raisins-golden header ul {
+    width: 80%;
+    margin: 0 auto 1%;
+    box-sizing: border-box;
+    list-style: none;
+    background: rgba(101, 101, 165, 0);
+    text-align: left;
+    color: rgba(255, 255, 255, .9);
+    font-size: .8em
+}
+
+.new-landing-wrapper main section#page-raisins-golden header ul li {
+    display: block;
+    width: 40%;
+    margin: .5% auto;
+    padding: 0;
+    background-color: rgba(0, 0, 0, .6);
+    box-sizing: border-box;
+    vertical-align: middle
+}
+
+.new-landing-wrapper main section#page-raisins-golden header ul li em {
+    background-color: rgba(106, 175, 33, .7);
+    padding: 1% 2%;
+    font-weight: 600;
+    font-size: 1.125em;
+    width: 25%;
+    text-align: center;
+    margin-right: 1.5%
+}
+
+.new-landing-wrapper main section#ship-pack-golden {
+    background-color: rgba(0, 0, 0, .03);
+    padding: 3% 0
+}
+
+.new-landing-wrapper main section#ship-pack-golden h2 {
+    background-color: rgba(95, 43, 115, .8);
+    padding: 1% 0;
+    box-sizing: border-box;
+    color: rgba(255, 255, 255, .8);
+    font-size: 1.2em;
+    text-align: center;
+    border: 0;
+    width: 25%;
+    margin: 0 auto 3%
+}
+
+.new-landing-wrapper main section#nutrition-golden div.table div.tr div:nth-child(2),
+.new-landing-wrapper main section#ship-pack-golden div.table div.tr div:nth-child(2) {
+    border-left: 1px solid rgba(255, 255, 255, .6)
+}
+
+.new-landing-wrapper main section#ship-pack-golden figure {
+    margin: 0 auto 3% 10%;
+    width: 40%;
+    overflow: hidden;
+    float: left
+}
+
+.new-landing-wrapper main section#ship-pack-golden figure img {
+    width: 100%
+}
+
+.new-landing-wrapper main section#ship-pack-golden ul {
+    margin: 3.5% 0 0;
+    list-style: none;
+    text-align: center;
+    font-size: .9em;
+    float: left;
+    width: 50%;
+    box-sizing: border-box;
+    padding-right: 10%
+}
+
+.new-landing-wrapper main section#ship-pack-golden ul li {
+    display: inline-block;
+    background: rgba(95, 43, 115, 1);
+    padding: 2% 3%;
+    border-radius: 1em;
+    color: rgba(255, 255, 255, .8);
+    margin: 0 0 5% 5%
+}
+
+.new-landing-wrapper main section#ship-pack-golden div.table {
+    clear: both;
+    width: 60%;
+    margin: 0 auto;
+    padding: 0 0 1.5%;
+    box-sizing: border-box;
+    background-color: rgba(95, 43, 115, .9);
+    text-align: center;
+    border-radius: 2.5em;
+    font-size: .9em;
+    color: rgba(255, 255, 255, .8);
+    overflow: hidden
+}
+
+.new-landing-wrapper main section#ship-pack-golden div.table div.tr {
+    width: 100%;
+    overflow: hidden;
+    padding: 1% 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .5)
+}
+
+.new-landing-wrapper main section#ship-pack-golden div.table div.tr:nth-child(1),
+.new-landing-wrapper main section#ship-pack-golden div.table div.tr:nth-child(5) {
+    background-color: rgba(0, 0, 0, .2)
+}
+
+.new-landing-wrapper main section#ship-pack-golden div.table div.tr:nth-child(1) {
+    padding-top: 1.5%
+}
+
+.new-landing-wrapper main section#ship-pack-golden div.table div.tr div.td,
+.new-landing-wrapper main section#ship-pack-golden div.table div.tr div.th {
+    float: left;
+    width: 33%
+}
+
+.new-landing-wrapper main section#ship-pack-golden div.table div.tr div.th {
+    font-weight: 600;
+    color: rgba(246, 188, 74, 1)
+}
+
+.new-landing-wrapper main section#nutrition-golden {
+    box-sizing: border-box;
+    padding: 3% 0
+}
+
+.new-landing-wrapper main section#nutrition-golden h2 {
+    background-color: rgba(0, 0, 0, .7);
+    padding: 1% 0;
+    box-sizing: border-box;
+    color: rgba(255, 255, 255, .8);
+    font-size: 1.2em;
+    text-align: center;
+    border: 0;
+    width: 22%;
+    margin: 0 auto 3%
+}
+
+.new-landing-wrapper main section#nutrition-golden div.table {
+    clear: both;
+    width: 30%;
+    margin: 0 auto;
+    padding: .2% 0;
+    box-sizing: border-box;
+    background-color: rgba(95, 43, 115, .9);
+    text-align: center;
+    border-radius: 2.5em;
+    font-size: .9em;
+    color: rgba(255, 255, 255, .8);
+    overflow: hidden
+}
+
+.new-landing-wrapper main section#nutrition-golden div.table div.tr {
+    width: 100%;
+    overflow: hidden;
+    padding: 1.5% 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .5)
+}
+
+.new-landing-wrapper main section#nutrition-golden div.table div.tr:last-child {
+    border-bottom: none
+}
+
+.new-landing-wrapper main section#nutrition-golden div.table div.tr div.td,
+.new-landing-wrapper main section#nutrition-golden div.table div.tr div.th {
+    float: left;
+    width: 49%
+}
+
+.new-landing-wrapper main section#nutrition-golden div.table div.tr div.th {
+    font-weight: 600;
+    color: rgba(246, 188, 74, 1)
+}
+
+.new-landing-wrapper main section#nutrition-golden div.table div.tr div:nth-child(1) {
+    box-sizing: border-box;
+    padding-left: 10%;
+    text-align: left
+}
+
+.new-landing-wrapper main section#page-other-products {
+    box-sizing: border-box;
+    display: block;
+    padding: 5.4em 0 0
+}
+
+.new-landing-wrapper main section#page-other-products header {
+    overflow: hidden;
+    height: 83vh;
+    z-index: -1;
+    position: relative;
+    background: 0 0;
+    border: 0
+}
+
+.new-landing-wrapper main section#page-other-products header h1 {
+    text-align: center;
+    font-size: 1.4em;
+    color: rgba(95, 43, 115, .8);
+    margin: 2.5% auto 2%;
+    background-color: rgba(245, 245, 245, .8);
+    padding: 0 0 .5%;
+    box-sizing: border-box;
+    width: 25%
+}
+
+.new-landing-wrapper main section#page-other-products header h1 div {
+    background: rgba(95, 43, 115, .8);
+    color: rgba(255, 255, 255, .8);
+    padding: 2%;
+    font-weight: 500;
+    font-size: .9em;
+    margin-bottom: 3%
+}
+
+.new-landing-wrapper main section#page-other-products header ul {
+    width: 80%;
+    margin: 0 auto 1%;
+    box-sizing: border-box;
+    list-style: none;
+    background: rgba(101, 101, 165, 0);
+    text-align: left;
+    color: rgba(255, 255, 255, .9);
+    font-size: .8em
+}
+
+.new-landing-wrapper main section#page-other-products header ul li {
+    display: block;
+    width: 40%;
+    margin: .5% auto;
+    padding: 0;
+    background-color: rgba(0, 0, 0, .6);
+    box-sizing: border-box;
+    vertical-align: middle
+}
+
+.new-landing-wrapper main section#page-other-products header ul li em {
+    background-color: rgba(106, 175, 33, .7);
+    padding: 1% 2%;
+    font-weight: 600;
+    font-size: 1.125em;
+    width: 30%;
+    text-align: center;
+    margin-right: 1.5%
+}
+
+.new-landing-wrapper main section#ship-pack-other-products {
+    background-color: rgba(0, 0, 0, .03);
+    padding: 3% 0
+}
+
+.new-landing-wrapper main section#ship-pack-other-products h2 {
+    background-color: rgba(95, 43, 115, .8);
+    padding: 1% 0;
+    box-sizing: border-box;
+    color: rgba(255, 255, 255, .8);
+    font-size: 1.2em;
+    text-align: center;
+    border: 0;
+    width: 25%;
+    margin: 0 auto 3%
+}
+
+.new-landing-wrapper main section#ship-pack-other-products figure {
+    margin: 0 auto 3% 10%;
+    width: 40%;
+    overflow: hidden;
+    float: left
+}
+
+.new-landing-wrapper main section#ship-pack-other-products figure img {
+    width: 100%
+}
+
+.new-landing-wrapper main section#ship-pack-other-products ul {
+    margin: 3.5% 0 0;
+    list-style: none;
+    text-align: center;
+    font-size: .9em;
+    float: left;
+    width: 50%;
+    box-sizing: border-box;
+    padding-right: 10%
+}
+
+.new-landing-wrapper main section#ship-pack-other-products ul li {
+    display: inline-block;
+    background: rgba(95, 43, 115, 1);
+    padding: 2% 3%;
+    border-radius: 1em;
+    color: rgba(255, 255, 255, .8);
+    margin: 0 0 5% 5%
+}
+
+.new-landing-wrapper main section#ship-pack-other-products div.table {
+    clear: both;
+    width: 60%;
+    margin: 0 auto;
+    padding: 0 0 1.5%;
+    box-sizing: border-box;
+    background-color: rgba(95, 43, 115, .9);
+    text-align: center;
+    border-radius: 2.5em;
+    font-size: .9em;
+    color: rgba(255, 255, 255, .8);
+    overflow: hidden
+}
+
+.new-landing-wrapper main section#ship-pack-other-products div.table div.tr {
+    width: 100%;
+    overflow: hidden;
+    padding: 1% 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .5)
+}
+
+.new-landing-wrapper main section#ship-pack-other-products div.table div.tr:nth-child(1),
+.new-landing-wrapper main section#ship-pack-other-products div.table div.tr:nth-child(5) {
+    background-color: rgba(0, 0, 0, .2)
+}
+
+.new-landing-wrapper main section#ship-pack-other-products div.table div.tr:nth-child(1) {
+    padding-top: 1.5%
+}
+
+.new-landing-wrapper main section#ship-pack-other-products div.table div.tr div.td,
+.new-landing-wrapper main section#ship-pack-other-products div.table div.tr div.th {
+    float: left;
+    width: 49.5%
+}
+
+.new-landing-wrapper main section#ship-pack-other-products div.table div.tr div.th {
+    font-weight: 600;
+    color: rgba(246, 188, 74, 1)
+}
+
+.new-landing-wrapper main section#ship-pack-other-products div.table div.tr div:nth-child(2) {
+    border-left: 1px solid rgba(255, 255, 255, .6)
+}
+
+.new-landing-wrapper main section#page-quality {
+    padding: 5.4em 0 0;
+    box-sizing: border-box
+}
+
+.new-landing-wrapper main section#page-quality header {
+    overflow: hidden;
+    height: 100vh;
+    z-index: -1;
+    position: relative;
+    border: 0;
+    background: url(https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/header-quality.jpg) center no-repeat fixed;
+    padding-top: 9vh;
+    box-sizing: border-box
+}
+
+.new-landing-wrapper main section#page-quality header h1 {
+    font-size: 2.2em;
+    color: rgba(255, 255, 255, 1);
+    margin: 3% auto;
+    text-align: center
+}
+
+.new-landing-wrapper main section#page-quality header article p {
+    font-size: 1.12em;
+    line-height: 1.4em;
+    color: rgba(255, 255, 255, 1);
+    width: 60%;
+    padding: 0 4% 2%;
+    margin: 0 auto;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, .6)
+}
+
+.new-landing-wrapper main section#page-quality header article p:last-child {
+    border-bottom: .3em solid rgba(229, 163, 62, 1)
+}
+
+.new-landing-wrapper main section#page-quality div#nonGMO {
+    box-sizing: border-box;
+    padding: 3% 0;
+    font-size: .9em;
+    text-align: center
+}
+
+.new-landing-wrapper main section#page-quality div#nonGMO h2 {
+    background-color: rgba(0, 0, 0, .1);
+    margin: 0 auto 1%;
+    box-sizing: border-box;
+    color: rgba(0, 0, 0, .65);
+    font-weight: 800;
+    font-size: 1.1em;
+    text-align: center;
+    border-top: none;
+    width: 15%;
+    padding: 1%
+}
+
+.new-landing-wrapper main section#page-quality div#nonGMO figure {
+    margin: 0
+}
+
+.new-landing-wrapper main section#page-quality div#nonGMO p {
+    padding-bottom: 1%;
+    margin: 0 auto;
+    width: 50%;
+    text-align: left;
+    font-size: .9em
+}
+
+.new-landing-wrapper main aside.specs {
+    box-sizing: border-box;
+    padding: 2% 0;
+    text-align: center
+}
+
+.new-landing-wrapper main aside.specs button.btnSpecs {
+    border: 0;
+    background-color: rgba(225, 164, 64, .85);
+    padding: 1% 3%;
+    border-radius: .25em;
+    font-size: .9em;
+    color: rgba(255, 255, 255, .8);
+    transition: all .2s ease-in-out
+}
+
+.new-landing-wrapper main aside.specs button.btnSpecs:hover {
+    background-color: rgba(225, 164, 64, 1);
+    color: rgba(255, 255, 255, 1)
+}
+
+.new-landing-wrapper div#portapdf {
+    position: fixed;
+    width: 90vw;
+    height: 90vh;
+    top: 5vh;
+    left: 5vw;
+    z-index: 100;
+    padding: 3%;
+    background-color: rgba(250, 250, 250, 1);
+    border: 1px solid rgba(0, 0, 0, .65);
+    box-sizing: border-box;
+    border-radius: 1em
+}
+
+.new-landing-wrapper div#portapdf span.cierrapdf {
+    position: absolute;
+    top: 1.6%;
+    right: 1%;
+    color: rgba(255, 255, 255, .9);
+    height: 4vh;
+    width: 4vh;
+    text-align: center;
+    line-height: 4vh;
+    background-color: rgba(0, 0, 0, .6);
+    border-radius: 100%;
+    cursor: pointer;
+    transition: all .2s ease-in-out
+}
+
+.new-landing-wrapper div#portapdf span.cierrapdf:hover {
+    color: rgba(255, 255, 255, 1);
+    background-color: rgba(0, 0, 0, .8)
+}
+
+.new-landing-wrapper main section#page-contacto {
+    box-sizing: border-box;
+    display: block;
+    padding: 5.4em 0 0;
+    text-align: center
+}
+
+.new-landing-wrapper main section#page-contacto h1 {
+    font-size: 1.1em;
+    color: rgba(255, 255, 255, .9);
+    margin: 4% auto 2%;
+    text-align: center;
+    width: 15%;
+    padding: 1.5% 0;
+    background-color: rgba(95, 43, 115, .8)
+}
+
+.new-landing-wrapper main section#page-contacto input.wpcf7-form-control,
+.new-landing-wrapper main section#page-contacto textarea.wpcf7-form-control {
+    margin-bottom: 1%;
+    box-sizing: border-box;
+    padding: .6%;
+    font-size: .9em;
+    width: 40%;
+    transition: all .2s ease-in-out
+}
+
+.new-landing-wrapper main section#page-contacto input.wpcf7-form-control {
+    border-radius: .25em;
+    border: 1px solid rgba(0, 0, 0, .2)
+}
+
+.new-landing-wrapper main section#page-contacto input.wpcf7-form-control:focus,
+.new-landing-wrapper main section#page-contacto textarea.wpcf7-form-control:focus {
+    border: 1px solid rgba(0, 0, 0, .4)
+}
+
+.new-landing-wrapper main section#page-contacto textarea.wpcf7-form-control {
+    border-radius: .25em;
+    border: 1px solid rgba(0, 0, 0, .2);
+    max-width: 40%;
+    min-width: 40%;
+    height: 15em;
+    min-height: 15em;
+    max-height: 15em
+}
+
+.new-landing-wrapper main section#page-contacto input.wpcf7-submit {
+    width: 5%;
+    padding: 1%;
+    box-sizing: initial;
+    border: 0;
+    background-color: rgba(181, 194, 100, .8);
+    color: rgba(255, 255, 255, .8);
+    border-radius: .25em 1em;
+    transition: all .2s ease-in-out
+}
+
+.new-landing-wrapper div.wpcf7-mail-sent-ok,
+.new-landing-wrapper div.wpcf7-validation-errors {
+    font-size: .8em;
+    border: 0;
+    color: rgba(0, 0, 0, .6);
+    padding: 2% 0
+}
+
+.new-landing-wrapper main section#page-contacto input.wpcf7-submit:hover {
+    background-color: rgba(181, 194, 100, 1)
+}
+
+.new-landing-wrapper span.wpcf7-not-valid-tip {
+    font-size: .8em;
+    opacity: .8
+}
+
+.new-landing-wrapper div.wpcf7-validation-errors {
+    background-color: rgba(218, 218, 23, .8)
+}
+
+.new-landing-wrapper div.wpcf7-mail-sent-ok {
+    background-color: rgba(57, 143, 20, .8)
+}
+
+.new-landing-wrapper main footer {
+    background-color: rgba(61, 28, 74, 1);
+    padding: 2% 15%;
+    box-sizing: border-box;
+    overflow: hidden;
+    background-image: url(https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/background-footer.png);
+    background-repeat: no-repeat;
+    background-position: 62% 50%;
+    background-size: 15%;
+    font-size: .92em
+}
+
+.new-landing-wrapper main footer address,
+.new-landing-wrapper main footer div {
+    display: block;
+    float: left;
+    margin: 0;
+    font-style: normal
+}
+
+.new-landing-wrapper main footer div {
+    margin-right: 15%
+}
+
+.new-landing-wrapper main footer h3 {
+    color: rgba(255, 255, 255, .9);
+    font-size: 1.5em;
+    margin-bottom: .4em
+}
+
+.new-landing-wrapper main footer ul {
+    list-style: none;
+    font-size: .9em
+}
+
+.new-landing-wrapper main footer ul li {
+    color: rgba(255, 255, 255, .7);
+    margin-bottom: 2%
+}
+
+.new-landing-wrapper main footer ul li a {
+    color: rgba(255, 255, 255, .7);
+    text-decoration: none;
+    transition: all .2s ease-in-out
+}
+
+.new-landing-wrapper main footer ul li a:hover {
+    margin-left: 15%
+}
+
+.new-landing-wrapper main footer span {
+    float: right;
+    display: block;
+    transform: translateY(175%);
+    text-align: center
+}
+
+.new-landing-wrapper main footer span a {
+    display: inline-block
+}
+
+.new-landing-wrapper main footer span a img {
+    width: 65%
+}
+
+@media only screen and (min-device-width :320px) and (max-device-width :768px) {
+    .new-landing-wrapper header {
+        height: 5em
+    }
+
+    .new-landing-wrapper header a figure {
+        float: none;
+        display: inline-block;
+        vertical-align: middle;
+        width: 65%;
+        padding: 0;
+        margin: 5% 0 0 5%
+    }
+
+    .new-landing-wrapper header nav.menu-menu-principal-container {
+        position: fixed;
+        left: 0;
+        top: 6.1em;
+        width: 100%;
+        margin: 0;
+        padding: 5% 0;
+        text-align: center;
+        box-sizing: border-box;
+        background-color: transparent;
+        transform: translateX(-100%);
+        overflow: visible;
+        transition: all .25s ease-in-out;
+        float: none;
+        background: rgba(61, 28, 74, 1)
+    }
+
+    .new-landing-wrapper header nav.menu-menu-principal-container ul#menu-menu-principal li.menu-item {
+        display: block;
+        font-size: 1.2em;
+        width: 80%;
+        margin: 0 auto 3%;
+        padding: 0;
+        float: none;
+        border-bottom: 1px solid rgba(255, 255, 255, .2)
+    }
+
+    .new-landing-wrapper header nav ul li a {
+        padding: .5em 0
+    }
+
+    .new-landing-wrapper header span#btnMenu {
+        display: inline-block;
+        vertical-align: middle;
+        width: 10vw;
+        height: 10vw;
+        line-height: 10vw;
+        text-align: center;
+        background-color: rgba(255, 255, 255, .8);
+        border-radius: 100%;
+        margin-left: 10%
+    }
+
+    .new-landing-wrapper main section#sliderPrincipal div video {
+        width: auto;
+        height: 100vh;
+        transform: translateX(-50vw)
+    }
+
+    .new-landing-wrapper main section#traz-producto {
+        padding: 3% 10% 8%
+    }
+
+    .new-landing-wrapper main section#traz-producto h2 {
+        width: 100%;
+        font-size: 1.2em;
+        margin: 10% auto;
+        padding: 5%
+    }
+
+    .new-landing-wrapper main section#traz-producto figure.img-vertically-integrated,
+    .new-landing-wrapper main section#traz-producto p.text-vertically-integrated {
+        display: block;
+        margin: -.1% auto
+    }
+
+    .new-landing-wrapper main section#traz-producto figure.img-vertically-integrated {
+        width: 50vw;
+        height: 50vw;
+        margin: 10% auto
+    }
+
+    .new-landing-wrapper main section#traz-producto p.p-center {
+        font-size: .95em;
+        width: 100%;
+        text-align: left;
+        padding: 5%;
+        box-sizing: border-box
+    }
+
+    .new-landing-wrapper p.p-left,
+    .new-landing-wrapper p.p-right {
+        text-align: left
+    }
+
+    .new-landing-wrapper main section#machines-modernas div.section-container {
+        padding: 0
+    }
+
+    .new-landing-wrapper main section#machines-modernas h2 {
+        margin-bottom: 0
+    }
+
+    .new-landing-wrapper main section h2 {
+        font-size: 1.2em;
+        padding: 5%;
+        margin-bottom: 5%
+    }
+
+    .new-landing-wrapper main section div.section-container {
+        padding: 2% 0
+    }
+
+    .new-landing-wrapper main section div.section-container video {
+        width: 100%
+    }
+
+    .new-landing-wrapper main section#quality-certif div.section-container {
+        padding: 10% 0
+    }
+
+    .new-landing-wrapper main section#quality-certif div.section-container span.logo-certificado {
+        width: 30%;
+        margin-right: 5%
+    }
+
+    .new-landing-wrapper main section#quality-certif div.section-container span.logo-certificado:first-child {
+        margin-left: 0
+    }
+
+    .new-landing-wrapper main footer {
+        padding: 8%;
+        text-align: center;
+        background-size: 100% !important
+    }
+
+    .new-landing-wrapper main footer address,
+    .new-landing-wrapper main footer div {
+        float: none;
+        margin: 0
+    }
+
+    .new-landing-wrapper main footer div {
+        margin-bottom: 8%
+    }
+
+    .new-landing-wrapper main footer ul {
+        font-size: 1em
+    }
+
+    .new-landing-wrapper main footer span {
+        float: none;
+        transform: translateY(0);
+        margin-top: 7%
+    }
+
+    .new-landing-wrapper main section#page-about-us,
+    .new-landing-wrapper main section#page-our-farms,
+    .new-landing-wrapper main section#page-quality {
+        padding: 4.5em 0 0
+    }
+
+    .new-landing-wrapper main section#page-about-us header,
+    .new-landing-wrapper main section#page-our-farms header {
+        padding: 5em 0 3em;
+        height: auto
+    }
+
+    .new-landing-wrapper main section#page-about-us header h1,
+    .new-landing-wrapper main section#page-our-farms div#secadoDOV h3,
+    .new-landing-wrapper main section#page-our-farms div#secadoTrad h3,
+    .new-landing-wrapper main section#page-our-farms header h1 {
+        width: 100%;
+        padding: 5% 0;
+        margin: 0 auto
+    }
+
+    .new-landing-wrapper main section#page-about-us header p,
+    .new-landing-wrapper main section#page-our-farms header p {
+        width: 90%;
+        box-sizing: border-box;
+        padding: 5%
+    }
+
+    .new-landing-wrapper main section#page-about-us div#visYmis {
+        padding: 10% 0 2%;
+        margin-top: -.5%
+    }
+
+    .new-landing-wrapper main section#page-about-us div#visYmis h2 {
+        width: 50%;
+        padding: 3% 0
+    }
+
+    .new-landing-wrapper main section#page-about-us div#visYmis p {
+        width: 80%;
+        margin: 0 auto 10%
+    }
+
+    .new-landing-wrapper main section#page-about-us div#values {
+        padding: 10%
+    }
+
+    .new-landing-wrapper main section#page-about-us div#values h2 {
+        width: 65%;
+        padding: 5% 0;
+        margin: 2% auto 10%
+    }
+
+    .new-landing-wrapper main section#page-about-us div#values ul li {
+        width: 100%;
+        display: block;
+        padding: 5%;
+        margin-bottom: 5% !important
+    }
+
+    .new-landing-wrapper main section#page-about-us div#values ul li:nth-child(2) {
+        margin: 0
+    }
+
+    .new-landing-wrapper main section#page-about-us div#values ul li:nth-child(3) {
+        margin: 0 !important
+    }
+
+    .new-landing-wrapper main section#background-process {
+        top: 4.5em
+    }
+
+    .new-landing-wrapper main section#background-process div video {
+        height: 100vh;
+        width: auto
+    }
+
+    .new-landing-wrapper main section#page-our-process {
+        padding: 5em 5% 1em
+    }
+
+    .new-landing-wrapper main section#page-our-process h1,
+    .new-landing-wrapper main section#page-quality header h1 {
+        width: 100%;
+        padding: 5% 0;
+        margin: 0
+    }
+
+    .new-landing-wrapper main section#page-our-process header h2 {
+        width: 100%;
+        padding: 3%;
+        margin: 4% 0
+    }
+
+    .new-landing-wrapper main section#page-our-process p {
+        padding: 5%;
+        margin-bottom: 10%;
+        box-sizing: border-box
+    }
+
+    .new-landing-wrapper main section#page-our-process header {
+        padding-top: 5em
+    }
+
+    .new-landing-wrapper main section#page-our-process h2 {
+        width: 100%;
+        padding: 5%;
+        margin: 30% auto 0;
+        color: rgba(0, 0, 0, .5)
+    }
+
+    .new-landing-wrapper main section#page-our-process ul li {
+        display: block;
+        padding: 3% 0;
+        font-size: .75em;
+        margin-bottom: 5%
+    }
+
+    .new-landing-wrapper main section#page-our-farms h2 {
+        width: 100%;
+        padding: 6% 0 0;
+        margin: 0;
+        font-size: 1.4em
+    }
+
+    .new-landing-wrapper main section#page-our-farms header h2 {
+        width: 100%;
+        font-size: 1.4em;
+        box-sizing: content-box
+    }
+
+    .new-landing-wrapper main section#page-our-farms div#secadoDOV,
+    .new-landing-wrapper main section#page-our-farms div#secadoTrad {
+        padding: 5%
+    }
+
+    .new-landing-wrapper main section#page-our-farms div#secadoTrad p {
+        width: 90%;
+        text-align: left;
+        padding: 5%;
+        margin-bottom: 5%
+    }
+
+    .new-landing-wrapper main section#page-our-farms div#secadoDOV p {
+        width: 90%;
+        text-align: left;
+        padding: 0;
+        margin-bottom: 5%
+    }
+
+    .new-landing-wrapper main section#page-our-farms div#secadoDOV p:last-child {
+        padding-bottom: 3%
+    }
+
+    .new-landing-wrapper main section#page-our-farms div#secadoDOV ul {
+        margin-bottom: 6%
+    }
+
+    .new-landing-wrapper main section#page-our-farms div#secadoDOV ul li {
+        width: 65%;
+        margin-bottom: 3%;
+        padding: 3% 0
+    }
+
+    .new-landing-wrapper main section#page-quality header {
+        height: auto
+    }
+
+    .new-landing-wrapper main section#page-quality header article {
+        width: 100%;
+        margin: 0;
+        padding: 5%;
+        box-sizing: border-box
+    }
+
+    .new-landing-wrapper main section#page-quality header article p {
+        margin: 0 auto 3%;
+        font-size: 1em;
+        width: 100%;
+        box-sizing: border-box
+    }
+
+    .new-landing-wrapper main section#page-quality div#nonGMO {
+        padding: 10% 0 5%
+    }
+
+    .new-landing-wrapper main section#page-quality div#nonGMO h2 {
+        width: 45%;
+        padding: 3%
+    }
+
+    .new-landing-wrapper main section#page-quality div#nonGMO p {
+        width: 85%;
+        margin: 0 auto 3%
+    }
+
+    .new-landing-wrapper main section#page-contacto h1 {
+        width: 65%;
+        padding: 5% 0;
+        margin: 8% auto 10%
+    }
+
+    .new-landing-wrapper main section#page-contacto input.wpcf7-form-control {
+        width: 90%;
+        padding: 2%;
+        margin-bottom: 5%
+    }
+
+    .new-landing-wrapper main section#page-contacto textarea.wpcf7-form-control {
+        max-width: 90%;
+        min-width: 90%;
+        margin-bottom: 5%;
+        width: 90%;
+        padding: 2%
+    }
+
+    .new-landing-wrapper main section#page-contacto input.wpcf7-submit {
+        margin: 0 auto;
+        box-sizing: border-box;
+        display: block;
+        padding: 3%
+    }
+
+    .new-landing-wrapper div.wpcf7-mail-sent-ok,
+    .new-landing-wrapper div.wpcf7-validation-errors {
+        margin: 0;
+        padding: 5%
+    }
+
+    .new-landing-wrapper header nav ul li ul {
+        position: relative;
+        z-index: 1;
+        top: 0;
+        border-bottom: 0;
+        padding: 5%;
+        box-sizing: border-box;
+        background: rgba(0, 0, 0, 0)
+    }
+
+    .new-landing-wrapper header nav ul li ul li.menu-item {
+        padding: 0 !important;
+        margin-bottom: 0 !important
+    }
+
+    .new-landing-wrapper header nav ul li ul li a {
+        color: rgba(255, 255, 255, .8);
+        font-size: .9em
+    }
+
+    .new-landing-wrapper header nav ul li ul li.menu-item:last-child {
+        border-bottom: 0 !important
+    }
+
+    .new-landing-wrapper header nav ul li ul li ul {
+        position: relative;
+        left: 0;
+        border: 0;
+        font-size: .75em
+    }
+
+    .new-landing-wrapper main section#page-other-products,
+    .new-landing-wrapper main section#page-raisins,
+    .new-landing-wrapper main section#page-raisins-golden,
+    .new-landing-wrapper main section#page-raisins-organic {
+        padding: 4.5em 0 0
+    }
+
+    .new-landing-wrapper main section#page-other-products header,
+    .new-landing-wrapper main section#page-raisins header,
+    .new-landing-wrapper main section#page-raisins-golden header,
+    .new-landing-wrapper main section#page-raisins-organic header {
+        height: auto;
+        padding-top: 3em
+    }
+
+    .new-landing-wrapper main section#page-other-products header h1,
+    .new-landing-wrapper main section#page-raisins header h1,
+    .new-landing-wrapper main section#page-raisins-golden header h1,
+    .new-landing-wrapper main section#page-raisins-organic header h1 {
+        width: 80%;
+        margin-bottom: 8%;
+        font-size: 1.2em
+    }
+
+    .new-landing-wrapper main section#page-other-products header ul,
+    .new-landing-wrapper main section#page-raisins header ul,
+    .new-landing-wrapper main section#page-raisins-golden header ul,
+    .new-landing-wrapper main section#page-raisins-organic header ul {
+        width: 100%
+    }
+
+    .new-landing-wrapper main section#page-other-products header ul li,
+    .new-landing-wrapper main section#page-raisins header ul li,
+    .new-landing-wrapper main section#page-raisins-golden header ul li,
+    .new-landing-wrapper main section#page-raisins-organic header ul li {
+        width: 100%;
+        margin-bottom: 3%;
+        text-align: center;
+        padding: 0 0 2%;
+        font-size: 1.2em
+    }
+
+    .new-landing-wrapper main section#page-other-products header ul li em,
+    .new-landing-wrapper main section#page-raisins header ul li em,
+    .new-landing-wrapper main section#page-raisins-golden header ul li em,
+    .new-landing-wrapper main section#page-raisins-organic header ul li em {
+        width: 100%;
+        margin-bottom: 2%;
+        font-size: .95em
+    }
+
+    .new-landing-wrapper main section#ship-pack,
+    .new-landing-wrapper main section#ship-pack-golden,
+    .new-landing-wrapper main section#ship-pack-organic,
+    .new-landing-wrapper main section#ship-pack-other-products {
+        padding: 10% 0 5%
+    }
+
+    .new-landing-wrapper main section#ship-pack h2,
+    .new-landing-wrapper main section#ship-pack-golden h2,
+    .new-landing-wrapper main section#ship-pack-organic h2,
+    .new-landing-wrapper main section#ship-pack-other-products h2 {
+        width: 65%;
+        padding: 5% 0;
+        margin-bottom: 8%
+    }
+
+    .new-landing-wrapper main section#ship-pack figure,
+    .new-landing-wrapper main section#ship-pack-golden figure,
+    .new-landing-wrapper main section#ship-pack-organic figure,
+    .new-landing-wrapper main section#ship-pack-other-products figure {
+        float: none;
+        width: 90%;
+        margin: 0 auto 5%
+    }
+
+    .new-landing-wrapper main section#ship-pack ul,
+    .new-landing-wrapper main section#ship-pack-golden ul,
+    .new-landing-wrapper main section#ship-pack-organic ul,
+    .new-landing-wrapper main section#ship-pack-other-products ul {
+        width: 90%;
+        float: none;
+        padding: 0;
+        margin: 0 auto
+    }
+
+    .new-landing-wrapper main section#ship-pack ul li,
+    .new-landing-wrapper main section#ship-pack-golden ul li,
+    .new-landing-wrapper main section#ship-pack-organic ul li,
+    .new-landing-wrapper main section#ship-pack-other-products ul li {
+        display: block;
+        padding: 5%;
+        margin: 0 auto 5%
+    }
+
+    .new-landing-wrapper main section#ship-pack div.table,
+    .new-landing-wrapper main section#ship-pack-golden div.table,
+    .new-landing-wrapper main section#ship-pack-organic div.table,
+    .new-landing-wrapper main section#ship-pack-other-products div.table {
+        width: 100%;
+        padding: 0;
+        border-radius: 0
+    }
+
+    .new-landing-wrapper main section#ship-pack div.table div.tr,
+    .new-landing-wrapper main section#ship-pack-golden div.table div.tr,
+    .new-landing-wrapper main section#ship-pack-organic div.table div.tr,
+    .new-landing-wrapper main section#ship-pack-other-products div.table div.tr {
+        padding: 2% 0
+    }
+
+    .new-landing-wrapper main section#ship-pack div.table div.tr div:nth-child(2),
+    .new-landing-wrapper main section#ship-pack-golden div.table div.tr div:nth-child(2),
+    .new-landing-wrapper main section#ship-pack-organic div.table div.tr div:nth-child(2),
+    .new-landing-wrapper main section#ship-pack-other-products div.table div.tr div:nth-child(2) {
+        border-right: 1px solid rgba(255, 255, 255, .6)
+    }
+
+    .new-landing-wrapper main section#nutrition h2,
+    .new-landing-wrapper main section#nutrition-golden h2,
+    .new-landing-wrapper main section#nutrition-organic h2 {
+        width: 50%;
+        padding: 3% 0;
+        margin: 5% auto;
+        font-size: 1em
+    }
+
+    .new-landing-wrapper main section#nutrition div.table,
+    .new-landing-wrapper main section#nutrition-golden div.table,
+    .new-landing-wrapper main section#nutrition-organic div.table {
+        width: 100%;
+        border-radius: 0;
+        margin: 7% 0 3%
+    }
+
+    .new-landing-wrapper main section#nutrition div.table div.tr,
+    .new-landing-wrapper main section#nutrition-golden div.table div.tr,
+    .new-landing-wrapper main section#nutrition-organic div.table div.tr {
+        padding: 2% 0
+    }
+
+    .new-landing-wrapper main aside.specs {
+        padding: 5%
+    }
+
+    .new-landing-wrapper main aside.specs button.btnSpecs {
+        width: 50%;
+        padding: 5%
+    }
+}
+
+.new-landing-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    overflow-y: auto;
+    background-color: #fff;
+    text-align: left;
+}
+
+.new-landing-wrapper main {
+    display: block;
+}
+
+/* Fix video background styling just in case */
+.new-landing-wrapper section#sliderPrincipal div video {
+    object-fit: cover;
+}
+
+/* Ensure login button sticks out */
+.new-landing-wrapper #btn-login-nav {
+    color: #F4B039 !important;
+    font-weight: bold;
+}
+
+/* --- Custom overrides to match naturalfoodargentina.com --- */
+
+/* Fix the header navigation layout & stickiness */
+.new-landing-wrapper header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.new-landing-wrapper #btnMenu {
+    cursor: pointer;
+    font-size: 2em;
+    color: white;
+    position: absolute;
+    right: 5%;
+    top: 15%;
+}
+
+@media only screen and (min-device-width :769px) {
+    .new-landing-wrapper header nav {
+        display: block !important;
+    }
+
+    .new-landing-wrapper #btnMenu {
+        display: none !important;
+    }
+}
+
+/* Ensure the hero video covers the full screen */
+.new-landing-wrapper main section#sliderPrincipal {
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.new-landing-wrapper main section#sliderPrincipal div video {
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+}
+
+/* Specific button styling to match their aesthetic */
+.new-landing-wrapper #btn-login-nav {
+    background-color: rgba(244, 176, 57, .9);
+    color: #fff !important;
+    display: inline-block;
+    padding: 0.5em 1.5em !important;
+    border-radius: 20px;
+    margin-top: 1.5em;
+    transition: background-color 0.3s;
+}
+
+.new-landing-wrapper #btn-login-nav:hover {
+    background-color: rgba(225, 164, 64, 1);
+    color: white !important;
+}
+
+/* Align navigation properly */
+.new-landing-wrapper header nav ul li {
+    vertical-align: middle;
+}
+
+/* Mobile menu open class */
+.new-landing-wrapper header nav.menu-menu-principal-container.open {
+    transform: translateX(0);
+}
+
+/* Allow pointer events for menu button */
+.new-landing-wrapper header span#btnMenu {
+    z-index: 10001;
+}
+
+/* Fix some link styles being overridden */
+.new-landing-wrapper header nav ul li a {
+    text-decoration: none !important;
+}
+
+
+/* --- Desktop/Wide Screen Styling Adjustments --- */
+@media screen and (min-width: 1024px) {
+
+    /* Adjust header widths and positioning */
+    .new-landing-wrapper header nav {
+        width: 70% !important;
+        /* Keep enough space for nav */
+        padding: 0 2% 0 0 !important;
+    }
+
+    .new-landing-wrapper header a figure {
+        width: 30% !important;
+        /* Increased back closer to original to make logo big */
+    }
+
+    .new-landing-wrapper header nav ul li {
+        width: auto !important;
+        padding: 0 0.8vw !important;
+    }
+
+    .new-landing-wrapper header nav ul {
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        height: 5.5em !important;
+        /* Match header height */
+    }
+
+    .new-landing-wrapper header nav ul li a {
+        padding: 0 !important;
+        line-height: 5.5em !important;
+        /* vertically center links */
+        font-size: 0.85em !important;
+        /* reduce font size to fit all items */
+    }
+
+    .new-landing-wrapper #btn-login-nav {
+        margin-top: 0 !important;
+        line-height: normal !important;
+        padding: 0.5em 1.2em !important;
+        margin-left: 0.5vw !important;
+    }
+}
+
+/* Additional adjustment for medium screens (tablets) */
+@media screen and (min-width: 769px) and (max-width: 1023px) {
+    .new-landing-wrapper header nav {
+        width: 70% !important;
+    }
+
+    .new-landing-wrapper header a figure {
+        width: 30% !important;
+    }
+
+    .new-landing-wrapper header nav ul {
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        height: 5.5em !important;
+    }
+
+    .new-landing-wrapper header nav ul li {
+        width: auto !important;
+        padding: 0 1vw !important;
+    }
+
+    .new-landing-wrapper header nav ul li a {
+        padding: 0 !important;
+        line-height: 5.5em !important;
+        font-size: 0.85em !important;
+        /* slightly smaller text to fit everything */
+    }
+
+    .new-landing-wrapper #btn-login-nav {
+        margin-top: 0 !important;
+        line-height: normal !important;
+        padding: 0.5em 1em !important;
+    }
+}
+
+/* Fix header navigation width to support 7 items instead of 6 */
+.new-landing-wrapper header nav>ul>li {
+    width: 14.2857% !important;
+}
+
+.new-landing-wrapper header nav ul.sub-menu li {
+    width: 100% !important;
+}
+
+/* Ensure the login button is centered inside the li */
+.new-landing-wrapper header nav ul li:last-child {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.new-landing-wrapper #btn-login-nav {
+    margin-top: 0 !important;
+    transform: translateY(1em);
+    /* visually center it */
+}
+
+/* Fix mobile menu logic via CSS if js is not running */
+@media only screen and (min-device-width :320px) and (max-device-width :768px) {
+    .new-landing-wrapper header nav ul li {
+        width: 100% !important;
+        /* stack them on mobile */
+    }
+}
+
+.new-landing-wrapper header {
+    position: fixed !important;
+    top: 0 !important;
+    width: 100%;
+    z-index: 10000 !important;
+}
+
+/* Ensure the wrapper handles scroll correctly */
+.new-landing-wrapper {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: 100vh !important;
+    z-index: 99999 !important;
+    /* Be over everything else from the SPA layout */
+}
+
+
+
+.new-landing-wrapper * {
+    box-sizing: border-box;
+    /* The original site relied on this heavily for floats */
+}
+
+/* Let's double check logo scaling as well */
+.new-landing-wrapper header a figure img {
+    max-width: 100%;
+    height: auto;
+    /* Removed max-height constraint entirely to match the original site's overflowing logo design */
+}
+
+/* Ensure the wrapper doesn't crop the fixed header or get wonky scrolling */
+.new-landing-wrapper {
+    transform: none !important;
+}
+
+/* --- Fix scroll transparency & hover effect --- */
+
+/* Base header state: transparent at the top, no bottom border */
+.new-landing-wrapper header {
+    background-color: transparent !important;
+    border-bottom: transparent 0.5em solid !important;
+    transition: background-color 0.3s ease, border-bottom 0.3s ease;
+}
+
+/* Hovering over the header ANYWHERE makes it colored, like the original site */
+.new-landing-wrapper header:hover {
+    background-color: rgba(95, 43, 115, 1) !important;
+    border-bottom: rgba(244, 176, 57, .9) 0.5em solid !important;
+}
+
+/* Scrolled state (applied via JS) */
+.new-landing-wrapper header.scrolled {
+    background-color: rgba(95, 43, 115, 1) !important;
+    border-bottom: rgba(244, 176, 57, .9) 0.5em solid !important;
+}
+
+/* Fix submenu visibility if there are overlaps, submenu should always have solid background to be readable */
+.new-landing-wrapper header nav ul li ul {
+    background-color: rgba(80, 36, 97, 1) !important;
+}
+
+/* --- FIX DROPDOWN MENUS --- */
+
+/* Parent item needs to be relative so absolute child positions correctly */
+.new-landing-wrapper header nav>ul>li {
+    position: relative !important;
+}
+
+/* The sub-menu itself */
+.new-landing-wrapper header nav ul.sub-menu {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    background: rgba(80, 36, 97, 1) !important;
+    margin-top: -0.2em !important;
+    border-radius: 0 0 0.25em 0.25em !important;
+    display: none !important;
+    /* hidden by default */
+    padding: 0 !important;
+    min-width: 200px !important;
+    z-index: 1000 !important;
+}
+
+/* Show submenu when parent is hovered */
+.new-landing-wrapper header nav ul li:hover>ul.sub-menu {
+    display: block !important;
+}
+
+/* Items inside the submenu */
+.new-landing-wrapper header nav ul.sub-menu li {
+    width: 100% !important;
+    display: block !important;
+    border-bottom: 1px solid rgba(255, 255, 255, .1) !important;
+    position: relative !important;
+    float: none !important;
+    /* Prevent float issues */
+}
+
+/* Links inside submenu */
+.new-landing-wrapper header nav ul.sub-menu li a {
+    display: block !important;
+    width: 100% !important;
+    padding: 0.7em 1em !important;
+    box-sizing: border-box !important;
+    color: rgba(255, 255, 255, .9) !important;
+    text-align: left !important;
+}
+
+/* Hover effects for submenu links */
+.new-landing-wrapper header nav ul.sub-menu li:hover {
+    background-color: rgba(255, 255, 255, .1) !important;
+}
+
+/* Level 3 submenus (right aligned flyouts) */
+.new-landing-wrapper header nav ul.sub-menu ul.sub-menu {
+    top: 0 !important;
+    left: 100% !important;
+    margin: 0 !important;
+    border-left: rgba(244, 176, 57, .9) 0.5em solid !important;
+    border-bottom: none !important;
+    border-radius: 0 0.25em 0.25em 0 !important;
+}

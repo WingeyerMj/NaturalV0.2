@@ -1,0 +1,72 @@
+[
+    {
+        "fecha": "2025-09-15",
+        "labor": "Poda",
+        "finca": "El Espejo",
+        "clasifica": "EEI",
+        "cuartel": "21 - Ha:2.200, Pl:3584",
+        "totalJornadas": 24.5,
+        "variedad": "Flame Seedless",
+        "ciclo": "2025-2026"
+    },
+    {
+        "fecha": "2025-09-16",
+        "labor": "Poda dov",
+        "finca": "El Espejo",
+        "clasifica": "EEI",
+        "cuartel": "22 - Ha:1.800, Pl:3000",
+        "totalJornadas": 18.0,
+        "variedad": "Sultanina",
+        "ciclo": "2025-2026"
+    },
+    {
+        "fecha": "2025-09-17",
+        "labor": "Desmalezado",
+        "finca": "El Espejo",
+        "clasifica": "EEII",
+        "cuartel": "25 - Ha:3.500, Pl:5600",
+        "totalJornadas": 12.0,
+        "variedad": "Flame Seedless",
+        "ciclo": "2025-2026"
+    },
+    {
+        "fecha": "2025-09-18",
+        "labor": "Poda",
+        "finca": "Fincas Viejas",
+        "clasifica": "CaminoTruncado",
+        "cuartel": "FV1 - Ha:2.500, Pl:4000",
+        "totalJornadas": 30.0,
+        "variedad": "Superior Seedless",
+        "ciclo": "2025-2026"
+    },
+    {
+        "fecha": "2025-09-20",
+        "labor": "Riego",
+        "finca": "Fincas Viejas",
+        "clasifica": "La Chimbera",
+        "cuartel": "FV5 - Ha:3.000, Pl:4800",
+        "totalJornadas": 8.5,
+        "variedad": "Flame Seedless",
+        "ciclo": "2025-2026"
+    },
+    {
+        "fecha": "2025-10-05",
+        "labor": "Fumigación",
+        "finca": "El Espejo",
+        "clasifica": "EEIII",
+        "cuartel": "28 - Ha:2.200, Pl:3584",
+        "totalJornadas": 15.0,
+        "variedad": "Crimson",
+        "ciclo": "2025-2026"
+    },
+    {
+        "fecha": "2025-10-10",
+        "labor": "Poda",
+        "finca": "El Espejo",
+        "clasifica": "EEI",
+        "cuartel": "21 - Ha:2.200, Pl:3584",
+        "totalJornadas": 22.0,
+        "variedad": "Flame Seedless",
+        "ciclo": "2024-2025"
+    }
+]

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
+  <!-- Shield outline -->
+  <path d="M20 10 H180 V140 Q180 200 100 230 Q20 200 20 140 Z" 
+        fill="none" stroke="#1e1b6e" stroke-width="8" stroke-linejoin="round"/>
+  
+  <!-- Letter N -->
+  <text x="58" y="105" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="bold" fill="#1e1b6e">N</text>
+  
+  <!-- Letter F (overlapping slightly) -->
+  <text x="105" y="105" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="bold" fill="#1e1b6e">F</text>
+  
+  <!-- Grape cluster (small circles) -->
+  <circle cx="88" cy="58" r="5" fill="#4a3f8a"/>
+  <circle cx="100" cy="55" r="4" fill="#5b4fa0"/>
+  <circle cx="112" cy="58" r="5" fill="#4a3f8a"/>
+  <circle cx="94" cy="48" r="4" fill="#6b5fb0"/>
+  <circle cx="106" cy="48" r="4" fill="#6b5fb0"/>
+  <circle cx="100" cy="42" r="3.5" fill="#7b6fc0"/>
+  
+  <!-- Grape vine tendril -->
+  <path d="M100 38 Q108 28 115 32 Q120 35 116 42" fill="none" stroke="#4a3f8a" stroke-width="1.5"/>
+  <ellipse cx="118" cy="30" rx="5" ry="4" fill="#4a8a4f" opacity="0.7"/>
+  
+  <!-- Seeds/drops below letters -->
+  <ellipse cx="68" cy="130" rx="6" ry="8" fill="#1e1b6e" transform="rotate(-15 68 130)"/>
+  <ellipse cx="85" cy="132" rx="6" ry="8" fill="#1e1b6e" transform="rotate(-5 85 132)"/>
+  <ellipse cx="100" cy="133" rx="6" ry="8" fill="#1e1b6e"/>
+  <ellipse cx="115" cy="132" rx="6" ry="8" fill="#1e1b6e" transform="rotate(5 115 132)"/>
+  <ellipse cx="132" cy="130" rx="6" ry="8" fill="#1e1b6e" transform="rotate(15 132 130)"/>
+  
+  <!-- Vineyard field lines (radiating from bottom) -->
+  <g stroke="#1e1b6e" stroke-width="1.5" opacity="0.8">
+    <line x1="100" y1="150" x2="40" y2="198"/>
+    <line x1="100" y1="150" x2="50" y2="200"/>
+    <line x1="100" y1="150" x2="60" y2="202"/>
+    <line x1="100" y1="150" x2="70" y2="204"/>
+    <line x1="100" y1="150" x2="80" y2="206"/>
+    <line x1="100" y1="150" x2="90" y2="208"/>
+    <line x1="100" y1="150" x2="100" y2="210"/>
+    <line x1="100" y1="150" x2="110" y2="208"/>
+    <line x1="100" y1="150" x2="120" y2="206"/>
+    <line x1="100" y1="150" x2="130" y2="204"/>
+    <line x1="100" y1="150" x2="140" y2="202"/>
+    <line x1="100" y1="150" x2="150" y2="200"/>
+    <line x1="100" y1="150" x2="160" y2="198"/>
+  </g>
+</svg>
