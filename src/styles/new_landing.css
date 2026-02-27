@@ -32,11 +32,17 @@
 }
 
 .new-landing-wrapper header {
-    background: rgba(95, 43, 115, 1);
+    background: rgba(95, 43, 115, 0); /* Start transparent */
     font-size: .9em;
     height: 5.5em;
     position: fixed;
-    z-index: 1
+    z-index: 1000;
+    transition: background 0.3s ease, border-bottom 0.3s ease;
+}
+
+.new-landing-wrapper header.scrolled {
+    background: rgba(95, 43, 115, 1) !important;
+    border-bottom: rgba(244, 176, 57, .9) .5em solid !important;
 }
 
 .new-landing-wrapper header:hover {

@@ -17,16 +17,21 @@ document.addEventListener('DOMContentLoaded', () => {
     app.init();
 
     // Scroll Management for New Header
-    window.addEventListener('scroll', () => {
+    const handleScroll = (e) => {
         const header = document.getElementById('mainHeader');
-        if (header) {
-            if (window.scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
+        if (!header) return;
+
+        // Check scroll from window OR the target element (if internal scroll is happening)
+        const scrollTop = window.scrollY || e.target.scrollTop || 0;
+
+        if (scrollTop > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
         }
-    });
+    };
+
+    window.addEventListener('scroll', handleScroll, true); // Use capture to catch internal scrolls
 
     // Mobile Menu Toggle for New Landing (delegation since it's dynamic)
     document.addEventListener('click', (e) => {
