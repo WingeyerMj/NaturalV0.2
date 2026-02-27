@@ -151,7 +151,7 @@ export function renderLoginPage() {
     <div class="login-page">
       <div class="login-card">
         <div class="login-header">
-          <img src="/logo.svg" alt="NaturalFood" class="nf-logo nf-logo--lg">
+          <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" class="nf-logo nf-logo--lg">
           <h2>Bienvenido</h2>
           <p>Ingresa tus credenciales para acceder al sistema</p>
         </div>
@@ -232,7 +232,7 @@ export function renderDashboardLayout(user, menuItems, activeSection) {
     <div class="dashboard-layout">
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-          <img src="/logo.svg" alt="NaturalFood" class="nf-logo">
+          <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" class="nf-logo">
           <span class="sidebar-title">NATURALFOOD</span>
         </div>
         

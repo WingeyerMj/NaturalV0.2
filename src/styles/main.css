@@ -763,10 +763,8 @@ img {
 .nf-logo {
   width: 56px;
   height: 56px;
-  border-radius: 50%;
   object-fit: contain;
-  background: white;
-  padding: 5px;
+  background: transparent;
   flex-shrink: 0;
   animation: coinFlip 4s ease-in-out infinite;
 }
@@ -787,7 +785,7 @@ img {
 .nf-logo--lg {
   width: 100px;
   height: 100px;
-  padding: 10px;
+  background: transparent;
   margin: 0 auto var(--space-5);
   display: block;
 }

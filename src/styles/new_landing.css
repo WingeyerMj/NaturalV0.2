@@ -1,6 +1,5 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:300,400);
 
-.new-landing-wrapper header,
 .new-landing-wrapper header nav ul li ul {
     border-bottom: rgba(244, 176, 57, .9) .5em solid;
     width: 100%
@@ -32,12 +31,14 @@
 }
 
 .new-landing-wrapper header {
-    background: rgba(95, 43, 115, 0); /* Start transparent */
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
+    border-bottom: none !important;
     font-size: .9em;
     height: 5.5em;
     position: fixed;
     z-index: 1000;
     transition: background 0.3s ease, border-bottom 0.3s ease;
+    box-sizing: border-box;
 }
 
 .new-landing-wrapper header.scrolled {
@@ -47,7 +48,7 @@
 
 .new-landing-wrapper header:hover {
     background: rgba(95, 43, 115, 1) !important;
-    border-bottom: rgba(244, 176, 57, .9) .5em solid !important
+    border-bottom: rgba(244, 176, 57, .9) .5em solid !important;
 }
 
 .new-landing-wrapper header a {
@@ -212,7 +213,7 @@
 }
 
 .new-landing-wrapper main section#traz-producto {
-    background: url(https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/vertically-integrated/fondo-vertically-integrated.jpg) fixed;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/vertically-integrated/fondo-vertically-integrated.jpg) fixed;
     background-size: cover;
     padding: 3% 10%;
     overflow: hidden;
@@ -220,13 +221,14 @@
 }
 
 .new-landing-wrapper main section#traz-producto h2 {
-    font-size: 2.4em;
-    color: rgba(255, 255, 255, 1);
+    font-size: 3em;
+    color: rgba(244, 176, 57, 1);
     margin: 3% auto;
     text-align: center;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, .6);
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
     background-color: rgba(0, 0, 0, 0);
-    border: 0
+    border: 0;
+    font-weight: 800;
 }
 
 .new-landing-wrapper main section#traz-producto figure.img-vertically-integrated,
@@ -256,12 +258,13 @@
 }
 
 .new-landing-wrapper main section#traz-producto p.text-vertically-integrated {
-    font-size: 1.2em;
+    font-size: 1.5em;
     line-height: 1.4em;
-    color: rgba(255, 255, 255, 1);
+    color: rgba(244, 176, 57, 1);
     padding: 2% 4% 4%;
     margin: 0 auto;
-    text-shadow: 2px 2px 3px rgba(0, 0, 0, .6)
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+    font-weight: 600;
 }
 
 .new-landing-wrapper main section#traz-producto p.p-left {
@@ -2603,26 +2606,9 @@
     transform: none !important;
 }
 
-/* --- Fix scroll transparency & hover effect --- */
+/* Header states are handled at the top of the file to stay organized */
 
-/* Base header state: transparent at the top, no bottom border */
-.new-landing-wrapper header {
-    background-color: transparent !important;
-    border-bottom: transparent 0.5em solid !important;
-    transition: background-color 0.3s ease, border-bottom 0.3s ease;
-}
-
-/* Hovering over the header ANYWHERE makes it colored, like the original site */
-.new-landing-wrapper header:hover {
-    background-color: rgba(95, 43, 115, 1) !important;
-    border-bottom: rgba(244, 176, 57, .9) 0.5em solid !important;
-}
-
-/* Scrolled state (applied via JS) */
-.new-landing-wrapper header.scrolled {
-    background-color: rgba(95, 43, 115, 1) !important;
-    border-bottom: rgba(244, 176, 57, .9) 0.5em solid !important;
-}
+/* Header states are handled at the top of the file to stay organized */
 
 /* Fix submenu visibility if there are overlaps, submenu should always have solid background to be readable */
 .new-landing-wrapper header nav ul li ul {
