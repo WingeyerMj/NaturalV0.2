@@ -690,9 +690,9 @@ export class AppController {
             type: 'line',
             data: stats,
             options: {
-                ...this.getChartOptions('Kg/Ha'),
+                ...this.getChartOptions('Kg'),
                 plugins: {
-                    ...this.getChartOptions('Kg/Ha').plugins,
+                    ...this.getChartOptions('Kg').plugins,
                     legend: {
                         display: true,
                         position: 'top',
@@ -713,7 +713,7 @@ export class AppController {
                             label: function (context) {
                                 let label = context.dataset.label || '';
                                 if (label) label += ': ';
-                                if (context.parsed.y !== null) label += new Intl.NumberFormat('es-AR').format(context.parsed.y) + ' Kg/Ha';
+                                if (context.parsed.y !== null) label += new Intl.NumberFormat('es-AR').format(context.parsed.y) + ' Kg';
                                 return label;
                             }
                         }

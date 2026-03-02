@@ -906,14 +906,15 @@ export class SofiaApiModel {
             const filtered = this.applyFilters(harvestData, { ...baseFilters, ciclo: undefined });
 
             // Calculate yield for this cycle
-            const yieldStats = this.getRendimientoPredioStats(filtered);
+            const dashboardStats = this.getCosechaDashboardStats(filtered);
 
             // Populate predioHistory mapping
-            yieldStats.labels.forEach((predioName, predioIdx) => {
+            dashboardStats.predios.forEach(predio => {
+                const predioName = predio.name;
                 if (!predioHistory[predioName]) {
                     predioHistory[predioName] = new Array(cycles.length).fill(null);
                 }
-                predioHistory[predioName][i] = yieldStats.datasets[0].data[predioIdx];
+                predioHistory[predioName][i] = predio.kg;
             });
         }
 

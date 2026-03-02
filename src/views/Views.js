@@ -1537,14 +1537,14 @@ export function renderCosechaDashboard(stats) {
 
     <!-- Evolución de Rendimiento Chart -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); margin-top: var(--space-8);">
-        <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin: 0;">📈 Evolución de Rendimiento Promedio por Ciclo (Kg/Ha)</h4>
+        <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin: 0;">📈 Evolución de Producción por Ciclo (Kg Totales)</h4>
     </div>
     <div class="data-table-container animate-fade-in animate-delay-3" style="padding: var(--space-6); margin-bottom: var(--space-6);">
         <div style="height: 350px; position: relative;">
             <canvas id="chart-cosecha-evolucion-rendimiento"></canvas>
         </div>
         <p style="text-align: center; color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-4);">
-            Comparativa histórica de rendimiento (Kg/Ha) por ciclo productivo para cada predio.
+            Comparativa histórica del total cosechado (Kg fresco) por ciclo productivo para cada predio.
         </p>
     </div>
 
