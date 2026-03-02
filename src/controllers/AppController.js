@@ -123,6 +123,31 @@ export class AppController {
             const cycles = ['2021-2022', '2022-2023', '2023-2024', '2024-2025', '2025-2026'];
 
             try {
+                // Health Check: Verificar si el proxy/servidor de Sofía está vivo
+                let isSofiaDown = false;
+                try {
+                    const testRes = await fetch('/sofia-api/trabajvsfaenas');
+                    if (testRes.status === 502 || testRes.status === 504 || testRes.status === 500) {
+                        isSofiaDown = true;
+                    }
+                } catch (e) {
+                    isSofiaDown = true;
+                }
+
+                if (isSofiaDown) {
+                    if (progressMessage) {
+                        progressMessage.innerHTML = '<span style="color: #ef4444; font-weight: 800; font-size: 1.1em;">⚠️ ¡¡¡El Servidor Sofia momentaneamente esta caido!!!</span>';
+                    }
+                    if (progressBar) {
+                        progressBar.style.width = '100%';
+                        progressBar.style.backgroundColor = '#ef4444';
+                    }
+                    if (progressDetails) progressDetails.textContent = 'Modo offline activado por falla de conexión.';
+
+                    await new Promise(r => setTimeout(r, 10000));
+                    throw new Error("El Servidor de Sofia está caído o no resuelve.");
+                }
+
                 for (let i = 0; i < cycles.length; i++) {
                     const cycle = cycles[i];
                     const percent = Math.round(((i) / cycles.length) * 100);
@@ -516,13 +541,31 @@ export class AppController {
             const filtered = SofiaApiModel.applyFilters(data, filters);
             const stats = SofiaApiModel.getCosechaDashboardStats(filtered);
 
-            // Get full cycle data for Cosecha vs Levantado comparison (Levantado is not in cosecha-only data)
-            const fullCycleData = await SofiaApiModel.fetchCycleData(filters.ciclo || '2025-2026');
-            const fullFiltered = SofiaApiModel.applyFilters(fullCycleData, filters);
-            const clStats = SofiaApiModel.getCosechaLevantadoStats(fullFiltered);
+            const clWrapper = document.getElementById('cosecha-levantado-wrapper');
+            if (!clWrapper) {
+                // First pass, add wrapper
+                dashboard.innerHTML = renderCosechaDashboard(stats) + '<div id="cosecha-levantado-wrapper"></div>';
+                updateCosechaLevantadoWidget();
+            } else {
+                // Sub-components are already there, just replace the top dashboard
+                // We must use a temporary container to swap the HTML while preserving the wrapper
+                const tmp = document.createElement('div');
+                tmp.innerHTML = renderCosechaDashboard(stats);
 
-            dashboard.innerHTML = renderCosechaDashboard(stats)
-                + renderCosechaLevantadoTable(clStats);
+                // Clear all nodes in dashboard except the wrappers we want to preserve
+                Array.from(dashboard.childNodes).forEach(node => {
+                    if (node.id !== 'cosecha-levantado-wrapper') {
+                        node.remove();
+                    }
+                });
+
+                // Prepend new top content
+                while (tmp.firstChild) {
+                    dashboard.insertBefore(tmp.firstChild, clWrapper);
+                }
+            }
+
+
 
             // Update dynamic filter options
             updateFilterList('filter-cosecha-predio', 'predio', data);
@@ -537,7 +580,35 @@ export class AppController {
                 });
             }
 
-            // Re-render historical chart
+            // Bind cycle filter for rendement chart
+            const rendementCycleFilter = document.getElementById('filter-cosecha-rendimiento-ciclo');
+            if (rendementCycleFilter) {
+                rendementCycleFilter.value = filters.ciclo;
+                const updateLabel = (val) => {
+                    const label = document.getElementById('label-rendimiento-ciclo');
+                    if (label) label.textContent = val;
+                };
+                updateLabel(filters.ciclo);
+
+                rendementCycleFilter.addEventListener('change', async (e) => {
+                    const localCycle = e.target.value;
+                    updateLabel(localCycle);
+                    const localFullData = await SofiaApiModel.fetchCycleData(localCycle);
+                    const localFullFiltered = SofiaApiModel.applyFilters(localFullData, { ...filters, ciclo: localCycle });
+                    const rendementStats = SofiaApiModel.getRendimientoPredioStats(localFullFiltered);
+                    this.renderCosechaRendimientoPredioChart(rendementStats);
+                });
+            }
+
+            // Re-render charts
+            const fullCycleData = await SofiaApiModel.fetchCycleData(filters.ciclo);
+            const fullFiltered = SofiaApiModel.applyFilters(fullCycleData, filters);
+            const rendimientoStats = SofiaApiModel.getRendimientoPredioStats(fullFiltered);
+            this.renderCosechaRendimientoPredioChart(rendimientoStats);
+
+            const evolucionStats = await SofiaApiModel.getHistoricalYieldEvolution(filters);
+            this.renderCosechaEvolucionRendimientoChart(evolucionStats);
+
             const histStats = await SofiaApiModel.getHistoricalCosechaStats(filters);
             this.renderCosechaHistoryChart(histStats);
         };
@@ -555,7 +626,101 @@ export class AppController {
         bind('filter-cosecha-predio', 'predio');
         bind('filter-cosecha-variedad', 'variedad');
 
+        // State for inner widget
+        const clFiltersState = { finca: '', ciclo: filters.ciclo };
+
+        const updateCosechaLevantadoWidget = async () => {
+            const container = document.getElementById('cosecha-levantado-wrapper');
+            if (!container) return;
+
+            // Get full cycle data (ignoring top-level 'desde/hasta', just using local filter 'ciclo')
+            const fullCycleData = await SofiaApiModel.fetchCycleData(clFiltersState.ciclo || '2025-2026');
+            // Apply ONLY local finca filter (ignore global predio/variedades for this section as it's grouped)
+            const fullFiltered = SofiaApiModel.applyFilters(fullCycleData, { finca: clFiltersState.finca });
+            const clStats = SofiaApiModel.getCosechaLevantadoStats(fullFiltered);
+
+            container.innerHTML = renderCosechaLevantadoTable(clStats, clFiltersState.finca, clFiltersState.ciclo);
+
+            // Re-bind local elements
+            document.getElementById('filter-cl-finca')?.addEventListener('change', e => {
+                clFiltersState.finca = e.target.value;
+                updateCosechaLevantadoWidget();
+            });
+            document.getElementById('filter-cl-ciclo')?.addEventListener('change', e => {
+                clFiltersState.ciclo = e.target.value;
+                updateCosechaLevantadoWidget();
+            });
+        };
+
         await updateDashboard();
+    }
+
+    renderCosechaRendimientoPredioChart(stats) {
+        const ctx = document.getElementById('chart-cosecha-rendimiento-predio');
+        if (!ctx) return;
+
+        if (this.charts.cosechaRendimiento) {
+            this.charts.cosechaRendimiento.destroy();
+        }
+
+        // @ts-ignore
+        this.charts.cosechaRendimiento = new Chart(ctx, {
+            type: 'bar',
+            data: stats,
+            options: {
+                ...this.getChartOptions('Kg/Ha'),
+                plugins: {
+                    ...this.getChartOptions().plugins,
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+    renderCosechaEvolucionRendimientoChart(stats) {
+        const ctx = document.getElementById('chart-cosecha-evolucion-rendimiento');
+        if (!ctx) return;
+
+        if (this.charts.cosechaEvolucionRendimiento) {
+            this.charts.cosechaEvolucionRendimiento.destroy();
+        }
+
+        // @ts-ignore
+        this.charts.cosechaEvolucionRendimiento = new Chart(ctx, {
+            type: 'line',
+            data: stats,
+            options: {
+                ...this.getChartOptions('Kg/Ha'),
+                plugins: {
+                    ...this.getChartOptions('Kg/Ha').plugins,
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: 'rgba(255,255,255,0.7)',
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#1E293B',
+                        titleColor: '#F8FAFC',
+                        bodyColor: '#CBD5E1',
+                        borderWidth: 1,
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        padding: 12,
+                        callbacks: {
+                            label: function (context) {
+                                let label = context.dataset.label || '';
+                                if (label) label += ': ';
+                                if (context.parsed.y !== null) label += new Intl.NumberFormat('es-AR').format(context.parsed.y) + ' Kg/Ha';
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     renderCosechaHistoryChart(stats) {
@@ -1060,6 +1225,24 @@ export class AppController {
         document.getElementById('btn-hero-login')?.addEventListener('click', () => this.loadLogin());
         document.getElementById('btn-hero-features')?.addEventListener('click', () => {
             document.getElementById('machines-modernas')?.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Animation for #traz-producto elements
+        const trazObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('traz-anim-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        const trazElements = document.querySelectorAll('#traz-producto h2, #traz-producto figure, #traz-producto p');
+        trazElements.forEach((el, index) => {
+            el.classList.add('traz-anim-init');
+            // Adding a small progressive delay based on DOM order for a smoother cascade effect
+            el.style.transitionDelay = `${(index % 3) * 0.15}s`;
+            trazObserver.observe(el);
         });
     }
 

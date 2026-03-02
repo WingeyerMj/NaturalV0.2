@@ -44,17 +44,14 @@ export class SofiaApiModel {
 
     static BASE_URL = '/sofia-api/trabajvsfaenas';
 
-    /**
-     * Helper to generate monthly date ranges for a given cycle
-     */
     static getCycleRanges(ciclo) {
-        // Ciclo: 1 May -> 30 Apr
+        // Ciclo Agrícola: 1 Mayo -> 30 Abril
         const [startYear] = ciclo.split('-').map(Number);
         const ranges = [];
 
         let current = new Date(startYear, 4, 1); // May 1st
-        const end = new Date(); // To today or end of cycle
-        const cycleEnd = new Date(startYear + 1, 3, 30);
+        const end = new Date();
+        const cycleEnd = new Date(startYear + 1, 3, 30); // Apr 30th Next Year
         const limit = end < cycleEnd ? end : cycleEnd;
 
         while (current <= limit) {
@@ -100,8 +97,8 @@ export class SofiaApiModel {
      */
     static _cyclesCache = new Map();
 
-    static async fetchCycleData(ciclo) {
-        if (this._cyclesCache.has(ciclo)) {
+    static async fetchCycleData(ciclo, forceRefresh = false) {
+        if (this._cyclesCache.has(ciclo) && !forceRefresh) {
             return this._cyclesCache.get(ciclo);
         }
 
@@ -124,8 +121,20 @@ export class SofiaApiModel {
             }
         }
 
-        // Add normalized fields
-        const processedData = allJornales.map(r => {
+        // Deduplicate records (using composite signature)
+        // This is necessary because API calls with overlapping ranges or multiple calls for same cycle can return duplicate data
+        const uniqueRecords = new Map();
+        allJornales.forEach(r => {
+            const signature = `${r.finca}-${r.fecha}-${r.labor || ''}-${r.cuartel || ''}-${r.persona || ''}-${r.rendimiento || 0}-${r.jornada || 0}`;
+            if (!uniqueRecords.has(signature)) {
+                uniqueRecords.set(signature, r);
+            }
+        });
+
+        const cycleStartYear = parseInt(ciclo.split('-')[0]);
+
+        // Add normalized fields and clean up previous cycle's "Levantado" tails
+        const processedData = Array.from(uniqueRecords.values()).map(r => {
             const rendition = parseFloat(r.rendimiento) || 0;
             // User sample shows "jornada" as the field name for jornadas
             const jornadas = parseFloat(r.jornada) || parseFloat(r.totalJornadas) || 0;
@@ -142,12 +151,29 @@ export class SofiaApiModel {
                 totalJornadas: jornadas,
                 costo_ars: costo,
                 hectareas: info.ha,
-                clasifica: r.clasificacion || r.clasifica || r.Clasificacion || r.Clasifica || info.predio,
+                clasifica: r.clasifica || r.clasificacion || r.Clasificacion || r.Clasifica || info.predio,
                 variedad: r.variedad || r.variedades || r.Variedad || r.Variedades || info.variedad,
                 isCosecha,
                 labor_normalized: (r.finca === 'El Espejo' && (r.labor === 'Poda' || r.labor === 'Poda dov')) ? 'Poda' : r.labor,
                 fecha: r.fecha || r.Fecha || r.date || r.Date // Normalized date field
             };
+        }).filter(r => {
+            // EXCLUSION RULE:
+            // If the labor is 'cosecha' or 'levantado' and it happens in May/June of the START year,
+            // it's actually the tail from the PREVIOUS cycle. We exclude it so it doesn't inflate this cycle.
+            // But we keep 'Poda' or other labres so the hectares of those cuarteles get counted correctly.
+            const laborStr = r.labor ? r.labor.toLowerCase() : '';
+            const isHarvestOrLevantado = laborStr.includes('cosecha') || laborStr.includes('levantado');
+
+            if (isHarvestOrLevantado && r.fecha) {
+                const dateObj = new Date(r.fecha);
+                const yr = dateObj.getFullYear();
+                const mo = dateObj.getMonth(); // 0-indexed (4=May, 5=Jun)
+                if (yr === cycleStartYear && (mo === 4 || mo === 5)) {
+                    return false;
+                }
+            }
+            return true;
         });
 
         // Store in Cache
@@ -414,7 +440,6 @@ export class SofiaApiModel {
             // Cuarteles
             if (!cuarteles[r.cuartel]) {
                 cuarteles[r.cuartel] = 0;
-                // Skip "Gral" cuarteles from El Espejo for hectares count
                 const isGralEspejo = r.finca === 'El Espejo' && r.cuartel && r.cuartel.toLowerCase().includes('gral');
                 if (!isGralEspejo) {
                     const info = this.parseCuartelInfo(r.cuartel);
@@ -429,7 +454,8 @@ export class SofiaApiModel {
         });
 
         const PROPIA_KEYWORDS = ['Camino Truncado', 'EEI', 'EEII', 'EEIII', 'La Chimbera', 'Puente Alto'];
-        const origen = { propia: 0, terceros: 0 };
+        const origen = { propia: 0, terceros: 0, propiaHa: 0, promedioPropia: 0 };
+        const cuartelesPropios = new Set();
 
         data.forEach(r => {
             const kilos = r.rendimiento_val || 0;
@@ -438,10 +464,20 @@ export class SofiaApiModel {
             const isPropia = PROPIA_KEYWORDS.some(k => clasif.includes(k.toUpperCase()));
             if (isPropia) {
                 origen.propia += kilos;
+                if (r.cuartel && !cuartelesPropios.has(r.cuartel)) {
+                    cuartelesPropios.add(r.cuartel);
+                    const isGralEspejo = r.finca === 'El Espejo' && r.cuartel.toLowerCase().includes('gral');
+                    if (!isGralEspejo) {
+                        const info = SofiaApiModel.parseCuartelInfo(r.cuartel);
+                        origen.propiaHa += info.ha;
+                    }
+                }
             } else {
                 origen.terceros += kilos;
             }
         });
+
+        origen.promedioPropia = origen.propiaHa > 0 ? (origen.propia / origen.propiaHa) : 0;
 
         const sortObj = (obj) => Object.entries(obj)
             .map(([name, kg]) => ({ name, kg }))
@@ -457,6 +493,70 @@ export class SofiaApiModel {
             cuarteles: sortObj(cuarteles),
             variedades: sortObj(variedades),
             origen
+        };
+    }
+
+    /**
+     * Calculates Yield (Kg/Ha) per Predio for chart visualization
+     */
+    static getRendimientoPredioStats(data) {
+        const predioMap = {}; // name -> { kg: 0, ha: 0, cuarteles: Set }
+
+        data.forEach(r => {
+            const predioName = r.clasifica || 'Sin Clasificar';
+            if (!predioMap[predioName]) {
+                predioMap[predioName] = { kg: 0, ha: 0, cuarteles: new Set() };
+            }
+
+            // 1. Sum Kilos only if it's a harvest record
+            if (r.isCosecha) {
+                predioMap[predioName].kg += r.rendimiento_val || 0;
+            }
+
+            // 2. Track Hectares once per Cuartel to get the TOTAL area of the predio
+            if (r.cuartel && !predioMap[predioName].cuarteles.has(r.cuartel)) {
+                predioMap[predioName].cuarteles.add(r.cuartel);
+
+                // Skip Gral area for El Espejo
+                const isGralEspejo = r.finca === 'El Espejo' && r.cuartel.toLowerCase().includes('gral');
+                if (!isGralEspejo) {
+                    const info = this.parseCuartelInfo(r.cuartel);
+                    predioMap[predioName].ha += info.ha;
+                }
+            }
+        });
+
+        const stats = Object.entries(predioMap)
+            .map(([name, s]) => ({
+                name,
+                kg: s.kg,
+                ha: s.ha,
+                rendimiento: s.ha > 0 ? (s.kg / s.ha) : 0
+            }))
+            .filter(s => s.rendimiento > 0) // Only show predios with yield
+            .sort((a, b) => b.rendimiento - a.rendimiento);
+
+        const colors = [
+            'rgba(34, 197, 94, 0.6)',  // Green
+            'rgba(59, 130, 246, 0.6)',  // Blue
+            'rgba(168, 85, 247, 0.6)', // Purple
+            'rgba(245, 158, 11, 0.6)',  // Amber
+            'rgba(239, 68, 68, 0.6)',   // Red
+            'rgba(6, 182, 212, 0.6)',   // Cyan
+            'rgba(244, 63, 94, 0.6)',   // Rose
+            'rgba(139, 92, 246, 0.6)'   // Violet
+        ];
+
+        return {
+            labels: stats.map(s => s.name),
+            datasets: [{
+                label: 'Rendimiento (Kg/Ha)',
+                data: stats.map(s => Math.round(s.rendimiento)),
+                backgroundColor: colors.slice(0, stats.length),
+                borderColor: colors.map(c => c.replace('0.6', '1')).slice(0, stats.length),
+                borderWidth: 1,
+                borderRadius: 6
+            }]
         };
     }
 
@@ -489,12 +589,10 @@ export class SofiaApiModel {
 
             if (labor.includes('cosecha kg')) {
                 type = 'cosecha';
-                // Extract pass number: "cosecha kg 1", "cosecha kg 2", etc.
                 const match = labor.match(/cosecha\s*kg\s*(\d+)/i);
                 passNum = match ? parseInt(match[1]) : 1;
             } else if (labor.includes('levantado')) {
                 type = 'levantado';
-                // Extract pass number: "levantado 1", "levantado 2", etc.
                 const match = labor.match(/levantado\s*(\d+)/i);
                 passNum = match ? parseInt(match[1]) : 1;
             }
@@ -787,6 +885,70 @@ export class SofiaApiModel {
                 borderWidth: 1,
                 borderRadius: 6
             }]
+        };
+    }
+
+    /**
+     * Fetches historical Kg/Ha yield per predio for comparison across cycles.
+     */
+    static async getHistoricalYieldEvolution(baseFilters = {}) {
+        const cycles = ['2021-2022', '2022-2023', '2023-2024', '2024-2025', '2025-2026'];
+
+        // We will collect yield stats for each predio over all cycles
+        const predioHistory = {};
+
+        for (let i = 0; i < cycles.length; i++) {
+            const c = cycles[i];
+            let data = await this.fetchCycleData(c);
+
+            // Filter only harvest rows
+            const harvestData = data.filter(r => r.isCosecha);
+            const filtered = this.applyFilters(harvestData, { ...baseFilters, ciclo: undefined });
+
+            // Calculate yield for this cycle
+            const yieldStats = this.getRendimientoPredioStats(filtered);
+
+            // Populate predioHistory mapping
+            yieldStats.labels.forEach((predioName, predioIdx) => {
+                if (!predioHistory[predioName]) {
+                    predioHistory[predioName] = new Array(cycles.length).fill(null);
+                }
+                predioHistory[predioName][i] = yieldStats.datasets[0].data[predioIdx];
+            });
+        }
+
+        const colors = [
+            '#22c55e', // Green
+            '#3b82f6', // Blue
+            '#a855f7', // Purple
+            '#f59e0b', // Amber
+            '#ef4444', // Red
+            '#06b6d4', // Cyan
+            '#f43f5e', // Rose
+            '#8b5cf6'  // Violet
+        ];
+
+        let colorIndex = 0;
+        const datasets = Object.keys(predioHistory).map(predioName => {
+            const ds = {
+                label: predioName,
+                data: predioHistory[predioName],
+                borderColor: colors[colorIndex % colors.length],
+                pointBackgroundColor: colors[colorIndex % colors.length],
+                tension: 0.3,
+                fill: false,
+                borderWidth: 2
+            };
+            colorIndex++;
+            return ds;
+        });
+
+        // Filter out any predios that have all nulls
+        const validDatasets = datasets.filter(ds => ds.data.some(v => v !== null && v > 0));
+
+        return {
+            labels: cycles,
+            datasets: validDatasets
         };
     }
 }

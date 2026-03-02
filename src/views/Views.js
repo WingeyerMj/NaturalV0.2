@@ -1399,15 +1399,6 @@ export function renderCosechaDashboard(stats) {
 
       <div class="metric-card">
         <div class="metric-card-header">
-          <div class="metric-card-icon blue">📈</div>
-        </div>
-        <div class="metric-value">${formatKg(stats.rendimientoPromedio)} <small style="font-size: 0.5em; color: var(--text-tertiary);">kg/ha</small></div>
-        <div class="metric-label">RENDIMIENTO PROMEDIO</div>
-        <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Por hectárea</p>
-      </div>
-
-      <div class="metric-card">
-        <div class="metric-card-header">
           <div class="metric-card-icon green">🗺️</div>
         </div>
         <div class="metric-value">${stats.cuartelesCosechados}</div>
@@ -1502,7 +1493,11 @@ export function renderCosechaDashboard(stats) {
                 <div style="background: var(--color-primary-500); color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75em; font-weight: 600;">INTERNO</div>
             </div>
             <div class="metric-value" style="color: var(--color-primary-600); font-size: 2.5em;">${formatKg(stats.origen.propia)} <small style="font-size: 0.4em; color: var(--text-tertiary);">kg</small></div>
-            <p style="color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-2);">Camino Truncado, EEI-III, La Chimbera, Puente Alto</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-2); padding-top: var(--space-2); border-top: 1px solid rgba(0,0,0,0.05);">
+                <span style="font-size: 0.85em; color: var(--text-secondary);">Rendimiento Propio:</span>
+                <span style="font-weight: 700; color: var(--color-primary-500);">${formatKg(stats.origen.promedioPropia)} <small style="font-weight: 400; font-size: 0.8em;">kg/ha</small></span>
+            </div>
+            <p style="color: var(--text-tertiary); font-size: 0.85em; margin-top: var(--space-2);">Camino Truncado, EEI-III, La Chimbera, Puente Alto</p>
         </div>
         <div class="metric-card" style="border-left: 4px solid var(--color-accent-500); padding: var(--space-6);">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4);">
@@ -1513,6 +1508,46 @@ export function renderCosechaDashboard(stats) {
             <p style="color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-2);">Compra de uva a terceros</p>
         </div>
     </div>
+    
+    <!-- Rendimiento por Predio Chart -->
+    <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+        <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin: 0;">📊 Rendimiento Promedio por Predio (Kg/Ha) <span id="label-rendimiento-ciclo" style="opacity: 0.7; font-size: 0.85em;"></span></h4>
+        <div class="filter-group" style="margin: 0;">
+            <select class="form-select sofia-filter-select" id="filter-cosecha-rendimiento-ciclo" style="padding: 4px 12px; font-size: 0.9em; min-width: 150px;">
+                <option value="2025-2026">2025-2026</option>
+                <option value="2024-2025">2024-2025</option>
+                <option value="2023-2024">2023-2024</option>
+                <option value="2022-2023">2022-2023</option>
+                <option value="2021-2022">2021-2022</option>
+                <option value="2020-2021">2020-2021</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="data-table-container animate-fade-in animate-delay-2" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+        <div style="height: 350px; position: relative;">
+            <canvas id="chart-cosecha-rendimiento-predio"></canvas>
+        </div>
+        <p style="text-align: center; color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-4);">
+            Promedio de kilogramos cosechados en fresco por hectárea según clasificación.
+        </p>
+    </div>
+
+    <!-- Evolución de Rendimiento Chart -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); margin-top: var(--space-8);">
+        <h4 style="font-family: 'Outfit'; color: var(--text-secondary); margin: 0;">📈 Evolución de Rendimiento Promedio por Ciclo (Kg/Ha)</h4>
+    </div>
+    <div class="data-table-container animate-fade-in animate-delay-3" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+        <div style="height: 350px; position: relative;">
+            <canvas id="chart-cosecha-evolucion-rendimiento"></canvas>
+        </div>
+        <p style="text-align: center; color: var(--text-tertiary); font-size: 0.9em; margin-top: var(--space-4);">
+            Comparativa histórica de rendimiento (Kg/Ha) por ciclo productivo para cada predio.
+        </p>
+    </div>
+
     
     <!-- Historical Harvest Chart -->
     <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
@@ -1539,24 +1574,43 @@ export function renderCosechaDashboard(stats) {
     `;
 }
 
-export function renderCosechaLevantadoTable(clStats) {
+export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentCiclo = '2025-2026') {
   const fmt = (v) => new Intl.NumberFormat('es-AR').format(Math.round(v));
   const passes = [1, 2, 3, 4, 5];
   const groupColors = {
     'El Espejo': { accent: 'var(--color-accent-500)', bg: 'rgba(168, 85, 247, 0.08)' },
     'Fincas Viejas': { accent: 'var(--color-primary-500)', bg: 'rgba(59, 130, 246, 0.08)' }
   };
-  const globalFactor = clStats.grandTotalCosecha > 0 ? (clStats.grandTotalLevantado / clStats.grandTotalCosecha) : 0;
+  const globalFactor = clStats.grandTotalLevantado > 0 ? (clStats.grandTotalCosecha / clStats.grandTotalLevantado) : 0;
 
   return `
     <div class="section-divider" style="margin: var(--space-8) 0; height: 1px; background: var(--border-subtle);"></div>
-    <h3 style="font-family: 'Outfit'; color: var(--text-primary); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-3);">
-      🍇 Cosecha en Fresco vs. Levantado de Pasa
-    </h3>
-    <p style="color: var(--text-tertiary); font-size: 0.85em; margin-bottom: var(--space-6);">
-      Comparación de kilogramos cosechados en fresco (<strong>Cosecha KG</strong>) y kilogramos de pasa levantada de secadero (<strong>Levantado</strong>) por pasada (1-5), agrupado por clasificación.
-      El <strong>factor de reducción</strong> indica la proporción de pasa obtenida respecto al peso en fresco.
-    </p>
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-4); flex-wrap: wrap; gap: var(--space-4);">
+      <div>
+        <h3 style="font-family: 'Outfit'; color: var(--text-primary); margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-3);">
+          🍇 Cosecha en Fresco vs. Levantado de Pasa
+        </h3>
+        <p style="color: var(--text-tertiary); font-size: 0.85em; margin: 0;">
+          Comparación de kg cosechados en fresco y pasa levantada. Factor = (Fresco/Pasa).
+        </p>
+      </div>
+      <div style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center;">
+         <label class="form-label" style="margin:0; font-size: 0.85em;">Clasificación:</label>
+         <select class="form-select sofia-filter-select" id="filter-cl-finca" style="padding: 4px 12px; font-size: 0.9em; min-width: 130px;">
+            <option value="" ${currentFinca === '' ? 'selected' : ''}>Ambas Fincas</option>
+            <option value="El Espejo" ${currentFinca === 'El Espejo' ? 'selected' : ''}>El Espejo</option>
+            <option value="Fincas Viejas" ${currentFinca === 'Fincas Viejas' ? 'selected' : ''}>Fincas Viejas</option>
+         </select>
+         <label class="form-label" style="margin:0; margin-left: var(--space-2); font-size: 0.85em;">Ciclo:</label>
+         <select class="form-select sofia-filter-select" id="filter-cl-ciclo" style="padding: 4px 12px; font-size: 0.9em;">
+            ${['2025-2026', '2024-2025', '2023-2024', '2022-2023', '2021-2022', '2020-2021'].map(c =>
+    `<option value="${c}" ${currentCiclo === c ? 'selected' : ''}>${c}</option>`
+  ).join('')}
+         </select>
+      </div>
+    </div>
+
+
 
     <div class="dashboard-grid animate-fade-in" style="margin-bottom: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
       <div class="metric-card" style="padding: var(--space-5); border-left: 4px solid var(--color-primary-500);">
@@ -1573,14 +1627,13 @@ export function renderCosechaLevantadoTable(clStats) {
         <div class="metric-card-header"><div class="metric-card-icon amber">⚖️</div></div>
         <div class="metric-value" style="font-size: 1.8em;">${globalFactor.toFixed(2)}</div>
         <div class="metric-label">Factor de Reducción Global</div>
-        <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">${(globalFactor * 100).toFixed(1)}% del peso fresco</p>
       </div>
     </div>
 
     ${clStats.groups.map(g => {
     const colors = groupColors[g.name] || groupColors['El Espejo'];
     if (g.predios.length === 0) return '';
-    const gFactor = g.totalCosecha > 0 ? (g.totalLevantado / g.totalCosecha) : 0;
+    const gFactor = g.totalLevantado > 0 ? (g.totalCosecha / g.totalLevantado) : 0;
     return `
       <div class="data-table-container animate-fade-in animate-delay-1" style="padding: var(--space-6); border-left: 4px solid ${colors.accent}; margin-bottom: var(--space-6);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5); flex-wrap: wrap; gap: var(--space-3);">
@@ -1606,13 +1659,13 @@ export function renderCosechaLevantadoTable(clStats) {
             </thead>
             <tbody>
               ${g.predios.map(p => {
-      const pFactor = p.totalCosecha > 0 ? (p.totalLevantado / p.totalCosecha) : 0;
+      const pFactor = p.totalLevantado > 0 ? (p.totalCosecha / p.totalLevantado) : 0;
       return '<tr style="border-bottom: none;">' +
         '<td rowspan="3" style="vertical-align: middle; border-bottom: 2px solid var(--border-subtle);"><strong>' + p.name + '</strong></td>' +
         '<td style="font-size: 0.8em; color: #10b981; font-weight: 600;">🍇 Fresco</td>' +
         p.cosecha.map(v => '<td style="text-align: right; ' + (v > 0 ? 'color: #10b981; font-weight: 600;' : 'color: var(--text-tertiary); opacity: 0.5;') + '">' + (v > 0 ? fmt(v) : '—') + '</td>').join('') +
         '<td style="text-align: right; font-weight: 700; color: #059669;">' + fmt(p.totalCosecha) + '</td>' +
-        '<td rowspan="3" style="text-align: center; vertical-align: middle; font-size: 1.3em; font-weight: 800; color: #f59e0b; background: rgba(245, 158, 11, 0.06); border-bottom: 2px solid var(--border-subtle);">' + pFactor.toFixed(2) + '<div style="font-size: 0.5em; font-weight: 400; color: var(--text-tertiary);">' + (pFactor * 100).toFixed(1) + '%</div></td>' +
+        '<td rowspan="3" style="text-align: center; vertical-align: middle; font-size: 1.3em; font-weight: 800; color: #f59e0b; background: rgba(245, 158, 11, 0.06); border-bottom: 2px solid var(--border-subtle);">' + pFactor.toFixed(2) + '</td>' +
         '</tr>' +
         '<tr style="border-bottom: none;">' +
         '<td style="font-size: 0.8em; color: var(--color-accent-400); font-weight: 600;">🫘 Pasa</td>' +
@@ -1623,7 +1676,7 @@ export function renderCosechaLevantadoTable(clStats) {
         '<td style="font-size: 0.8em; color: #f59e0b; font-weight: 600;">⚖️ Factor</td>' +
         p.cosecha.map((c, i) => {
           const l = p.levantado[i];
-          const f = c > 0 ? (l / c) : 0;
+          const f = l > 0 ? (c / l) : 0;
           const hasData = c > 0 && l > 0;
           return '<td style="text-align: right; ' + (hasData ? 'color: #f59e0b; font-weight: 700;' : 'color: var(--text-tertiary); opacity: 0.5;') + '">' + (hasData ? f.toFixed(2) : '—') + '</td>';
         }).join('') +
@@ -1648,7 +1701,7 @@ export function renderCosechaLevantadoTable(clStats) {
                 <td style="font-size: 0.8em;">⚖️</td>
                 ${g.cosechaPasses.map((c, i) => {
       const l = g.levantadoPasses[i];
-      const f = c > 0 ? (l / c) : 0;
+      const f = l > 0 ? (c / l) : 0;
       return '<td style="text-align: right; color: #f59e0b;">' + (c > 0 && l > 0 ? f.toFixed(2) : '—') + '</td>';
     }).join('')}
                 <td style="text-align: right; color: #f59e0b;">${gFactor > 0 ? gFactor.toFixed(2) : '—'}</td>
