@@ -96,12 +96,197 @@ export class SofiaApiModel {
      * Implements caching to avoid redundant network requests.
      */
     static _cyclesCache = new Map();
+    static _dbPromise = null;
+    static _csvData = null;
+
+    // ── ALL CYCLES: desde CSV histórico hasta API actual ──
+    static ALL_CYCLES = [
+        '2012-2013', '2013-2014', '2014-2015', '2015-2016',
+        '2016-2017', '2017-2018', '2018-2019', '2019-2020',
+        '2020-2021', '2021-2022', '2022-2023', '2023-2024',
+        '2024-2025', '2025-2026'
+    ];
+
+    // Ciclos que están cubiertos por la API de Sofía (solo el ciclo actual en curso)
+    static API_CYCLES = ['2025-2026'];
+
+    /**
+     * Carga y parsea el archivo CSV histórico Cosecha 13-25.csv
+     * Retorna un objeto agrupado por ciclo, ej: { '2012-2013': [{finca, cuartel, variedad, has, kg}, ...] }
+     */
+    static async loadCSVHistorico() {
+        if (this._csvData) return this._csvData;
+
+        try {
+            const response = await fetch('/Fuentes/Cosecha 13-25.csv');
+            if (!response.ok) throw new Error('CSV not found');
+
+            const buffer = await response.arrayBuffer();
+            // Decodificar como latin1 (iso-8859-1) para los acentos
+            const text = new TextDecoder('iso-8859-1').decode(buffer);
+
+            const lines = text.split(/\r?\n/).filter(l => l.trim());
+            if (lines.length < 2) throw new Error('CSV vacío');
+
+            // Header: Finca;Predio;Cuartel;Variedad;Has;Año;Ciclo;Kg;Estado;Referencia
+            const header = lines[0].split(';').map(h => h.trim());
+            const idxFinca = header.indexOf('Finca');
+            const idxPredio = header.indexOf('Predio');
+            const idxCuartel = header.indexOf('Cuartel');
+            const idxVariedad = header.indexOf('Variedad');
+            const idxHas = header.indexOf('Has');
+            const idxCiclo = header.indexOf('Ciclo');
+            const idxKg = header.indexOf('Kg');
+            const idxAno = header.indexOf('Año');
+
+            const grouped = {};
+
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(';');
+                if (cols.length < 7) continue;
+
+                let ciclo = (cols[idxCiclo] || '').trim();
+                const ano = idxAno >= 0 ? (cols[idxAno] || '').trim() : '';
+                let isEstimado = false;
+
+                // Detectar filas BP2026 (presupuesto/estimado)
+                if ((!ciclo || !ciclo.includes('-')) && ano.toUpperCase().includes('BP')) {
+                    ciclo = '2025-2026';
+                    isEstimado = true;
+                }
+
+                if (!ciclo || !ciclo.includes('-')) continue;
+
+                const kgStr = (cols[idxKg] || '0').replace(/\./g, '').replace(',', '.').trim();
+                const kg = parseFloat(kgStr) || 0;
+                const hasStr = (cols[idxHas] || '0').replace(',', '.').trim();
+                const has = parseFloat(hasStr) || 0;
+
+                // Agrupar BP separadamente como 'BP-2025-2026'
+                const groupKey = isEstimado ? 'BP-2025-2026' : ciclo;
+
+                if (!grouped[groupKey]) grouped[groupKey] = [];
+                grouped[groupKey].push({
+                    finca: (cols[idxFinca] || '').trim(),
+                    predio: idxPredio >= 0 ? (cols[idxPredio] || '').trim() : (cols[idxFinca] || '').trim(),
+                    cuartel: (cols[idxCuartel] || '').trim(),
+                    variedad: (cols[idxVariedad] || '').trim(),
+                    has,
+                    kg,
+                    isEstimado
+                });
+            }
+
+            this._csvData = grouped;
+            console.log('[CSV Histórico] Cargados ciclos:', Object.keys(grouped).join(', '));
+            return grouped;
+        } catch (e) {
+            console.warn('[CSV Histórico] Error cargando CSV:', e);
+            this._csvData = {};
+            return {};
+        }
+    }
+
+    /**
+     * Obtiene los kg totales agrupados por finca desde el CSV para un ciclo dado
+     */
+    static getCSVCycleTotalsByFinca(csvData, ciclo) {
+        const rows = csvData[ciclo] || [];
+        const byFinca = {};
+        rows.forEach(r => {
+            if (!byFinca[r.finca]) byFinca[r.finca] = 0;
+            byFinca[r.finca] += r.kg;
+        });
+        return byFinca;
+    }
+
+    static getDB() {
+        if (!this._dbPromise) {
+            this._dbPromise = new Promise((resolve, reject) => {
+                if (!window.indexedDB) {
+                    reject(new Error("IndexedDB no está soportado en este navegador"));
+                    return;
+                }
+                const request = window.indexedDB.open('NaturalFoodDB', 1);
+                request.onerror = event => {
+                    console.warn("Error abriendo IndexedDB", event);
+                    reject(event.target.error);
+                };
+                request.onupgradeneeded = event => {
+                    const db = event.target.result;
+                    // Creamos el ObjectStore general: conceptualmente almacena nuestras "tablas" de ciclos históricos
+                    if (!db.objectStoreNames.contains('cyclesDatos')) {
+                        db.createObjectStore('cyclesDatos');
+                    }
+                };
+                request.onsuccess = event => resolve(event.target.result);
+            });
+        }
+        return this._dbPromise;
+    }
+
+    static async getLocalCycle(ciclo) {
+        try {
+            const db = await this.getDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(['cyclesDatos'], 'readonly');
+                const store = tx.objectStore('cyclesDatos');
+                const request = store.get(ciclo);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        } catch (e) {
+            console.warn("IndexedDB read error:", e);
+            return null;
+        }
+    }
+
+    static async saveLocalCycle(ciclo, data) {
+        try {
+            const db = await this.getDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(['cyclesDatos'], 'readwrite');
+                const store = tx.objectStore('cyclesDatos');
+                const request = store.put(data, ciclo);
+                request.onsuccess = () => resolve(true);
+                request.onerror = () => reject(request.error);
+            });
+        } catch (e) {
+            console.warn("IndexedDB write error:", e);
+        }
+    }
+
+    static getCurrentCycle() {
+        const now = new Date();
+        const year = now.getFullYear();
+        // Ciclo Agrícola en Sofía: 1 de Mayo al 30 de Abril
+        if (now.getMonth() < 4) { // Menor a Mayo (0-3)
+            return `${year - 1}-${year}`;
+        }
+        return `${year}-${year + 1}`;
+    }
 
     static async fetchCycleData(ciclo, forceRefresh = false) {
+        // 1. Omitir red si ya está en Memoria RAM
         if (this._cyclesCache.has(ciclo) && !forceRefresh) {
             return this._cyclesCache.get(ciclo);
         }
 
+        const activeCycle = this.getCurrentCycle();
+        const isManualHistorical = localStorage.getItem(`manualHistory_${ciclo}`) === 'true';
+        const isHistorical = (ciclo !== activeCycle) || isManualHistorical;
+
+        // 2. Si es histórico (ej. el ciclo anterior), traer los datos desde la Base de Datos Local
+        if (isHistorical && !forceRefresh) {
+            const localData = await this.getLocalCycle(ciclo);
+            if (localData && localData.length > 0) {
+                console.log(`[Base de Datos] Cargado el ciclo histórico ${ciclo} de la tabla local. Proceso agilizado.`);
+                this._cyclesCache.set(ciclo, localData);
+                return localData;
+            }
+        }
+
+        console.log(`[API] Obteniendo datos de las APIs del sistema Sofía para el periodo ${ciclo}...`);
         const ranges = this.getCycleRanges(ciclo);
         let allJornales = []; // Consolidate results here
 
@@ -178,6 +363,13 @@ export class SofiaApiModel {
 
         // Store in Cache
         this._cyclesCache.set(ciclo, processedData);
+
+        // Si es histórico, se almacena de forma definitiva en la Base de Datos Local
+        if (isHistorical) {
+            console.log(`[Base de Datos] Anexando el periodo histórico a la tabla del ciclo ${ciclo}`);
+            await this.saveLocalCycle(ciclo, processedData);
+        }
+
         return processedData;
     }
 
@@ -195,6 +387,28 @@ export class SofiaApiModel {
      */
     static async fetchCosecha(filters = {}) {
         const ciclo = filters.ciclo || '2025-2026';
+
+        // Si el ciclo NO está cubierto por la API, usar el CSV
+        if (!this.API_CYCLES.includes(ciclo)) {
+            const csvData = await this.loadCSVHistorico();
+            const rows = csvData[ciclo] || [];
+
+            // Convertir filas del CSV a formato compatible con el dashboard
+            this.DATA_COSECHA = rows.map(r => ({
+                finca: r.finca,
+                cuartel: r.cuartel,
+                variedad: r.variedad,
+                clasifica: r.predio, // Columna Predio del CSV es la clasificación
+                hectareas: r.has,
+                rendimiento_val: r.kg,
+                isCosecha: true,
+                ciclo: ciclo,
+                labor: 'Cosecha Kg',
+                fecha: `${ciclo.split('-')[1]}-02-15` // Fecha ficticia para compatibilidad
+            }));
+            return this.applyFilters(this.DATA_COSECHA, filters);
+        }
+
         const cycleData = await this.fetchCycleData(ciclo);
 
         // Filter only harvest tasks
@@ -337,6 +551,7 @@ export class SofiaApiModel {
         // Compute Ratios and Averages
         const compute = (obj) => ({
             ...obj,
+            costoUsd: obj.costoArs / usdRate,
             efficiency: obj.area > 0 ? obj.jornales / obj.area : 0,
             avgCostArs: obj.jornales > 0 ? obj.costoArs / obj.jornales : 0,
             avgCostUsd: obj.jornales > 0 ? (obj.costoArs / obj.jornales) / usdRate : 0
@@ -846,45 +1061,79 @@ export class SofiaApiModel {
     }
 
     /**
-     * Fetches annual harvest yields for comparison
+     * Fetches annual harvest yields for comparison.
+     * Returns two datasets: Real (solid) and Estimado BP (semi-transparent, only 2025-2026).
      */
     static async getHistoricalCosechaStats(baseFilters = {}) {
-        const cycles = ['2021-2022', '2022-2023', '2023-2024', '2024-2025', '2025-2026'];
-        const dataPoints = [];
+        const csvData = await this.loadCSVHistorico();
+        const cycles = this.ALL_CYCLES;
+        const realPoints = [];
+        const estimadoPoints = [];
+        const PROPIA_KEYWORDS = ['Camino Truncado', 'EEI', 'EEII', 'EEIII', 'La Chimbera', 'Puente Alto'];
+
+        const filterCsvRows = (rows) => {
+            let totalkg = 0;
+            rows.forEach(r => {
+                if (baseFilters.finca && r.finca !== baseFilters.finca) return;
+                if (baseFilters.variedad && r.variedad !== baseFilters.variedad) return;
+                if (baseFilters.origen === 'propia') {
+                    if (!PROPIA_KEYWORDS.some(k => (r.predio || '').toUpperCase().includes(k.toUpperCase()))) return;
+                }
+                if (baseFilters.origen === 'terceros') {
+                    if (PROPIA_KEYWORDS.some(k => (r.predio || '').toUpperCase().includes(k.toUpperCase()))) return;
+                }
+                totalkg += r.kg;
+            });
+            return totalkg;
+        };
 
         for (const c of cycles) {
-            let data = await this.fetchCycleData(c);
-            // Filter only harvest rows
-            const harvestData = data.filter(r => r.isCosecha);
+            if (c === '2025-2026') {
+                // Real: datos de la API (ciclo actual en curso)
+                let data = await this.fetchCycleData(c);
+                const harvestData = data.filter(r => r.isCosecha);
+                const filtered = this.applyFilters(harvestData, { ...baseFilters, ciclo: undefined });
+                const totalReal = filtered.reduce((acc, r) => acc + (r.rendimiento_val || 0), 0);
+                realPoints.push(totalReal);
 
-            // Apply other filters (Finca, Predio, etc.), ignoring the cycle filter itself
-            const filtered = this.applyFilters(harvestData, { ...baseFilters, ciclo: undefined });
-
-            const totalkg = filtered.reduce((acc, r) => acc + (r.rendimiento_val || 0), 0);
-            dataPoints.push(totalkg);
+                // Estimado: datos BP del CSV
+                const bpRows = csvData['BP-2025-2026'] || [];
+                estimadoPoints.push(filterCsvRows(bpRows));
+            } else {
+                // Datos CSV reales para ciclos históricos
+                const rows = csvData[c] || [];
+                realPoints.push(filterCsvRows(rows));
+                estimadoPoints.push(null); // Sin estimado para ciclos pasados
+            }
         }
 
-        let bgColor = 'rgba(74, 222, 128, 0.6)'; // Green (Default)
-        let borderColor = 'rgba(74, 222, 128, 1)';
-
-        if (baseFilters.origen === 'propia') {
-            bgColor = 'rgba(59, 130, 246, 0.6)'; // Blue (Primary)
-            borderColor = 'rgba(59, 130, 246, 1)';
-        } else if (baseFilters.origen === 'terceros') {
-            bgColor = 'rgba(168, 85, 247, 0.6)'; // Purple (Accent)
-            borderColor = 'rgba(168, 85, 247, 1)';
-        }
+        // Colores base según filtro origen
+        let baseR = 74, baseG = 222, baseB = 128;
+        if (baseFilters.origen === 'propia') { baseR = 59; baseG = 130; baseB = 246; }
+        else if (baseFilters.origen === 'terceros') { baseR = 168; baseG = 85; baseB = 247; }
 
         return {
             labels: cycles,
-            datasets: [{
-                label: 'Producción Total (Kg)',
-                data: dataPoints,
-                backgroundColor: bgColor,
-                borderColor: borderColor,
-                borderWidth: 1,
-                borderRadius: 6
-            }]
+            datasets: [
+                {
+                    label: 'Estimado BP (Kg)',
+                    data: estimadoPoints,
+                    backgroundColor: `rgba(${baseR}, ${baseG}, ${baseB}, 0.2)`,
+                    borderColor: `rgba(${baseR}, ${baseG}, ${baseB}, 0.45)`,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    order: 2
+                },
+                {
+                    label: 'Producción Real (Kg)',
+                    data: realPoints,
+                    backgroundColor: `rgba(${baseR}, ${baseG}, ${baseB}, 0.7)`,
+                    borderColor: `rgba(${baseR}, ${baseG}, ${baseB}, 1)`,
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    order: 1
+                }
+            ]
         };
     }
 
@@ -892,30 +1141,57 @@ export class SofiaApiModel {
      * Fetches historical Kg/Ha yield per predio for comparison across cycles.
      */
     static async getHistoricalYieldEvolution(baseFilters = {}) {
-        const cycles = ['2021-2022', '2022-2023', '2023-2024', '2024-2025', '2025-2026'];
+        const csvData = await this.loadCSVHistorico();
+        const PROPIA_KEYWORDS = ['Camino Truncado', 'EEI', 'EEII', 'EEIII', 'La Chimbera', 'Puente Alto'];
+        const cycles = this.ALL_CYCLES;
 
         // We will collect yield stats for each predio over all cycles
         const predioHistory = {};
 
         for (let i = 0; i < cycles.length; i++) {
             const c = cycles[i];
-            let data = await this.fetchCycleData(c);
 
-            // Filter only harvest rows
-            const harvestData = data.filter(r => r.isCosecha);
-            const filtered = this.applyFilters(harvestData, { ...baseFilters, ciclo: undefined });
+            if (this.API_CYCLES.includes(c)) {
+                // ── Datos de API ──
+                let data = await this.fetchCycleData(c);
+                const harvestData = data.filter(r => r.isCosecha);
+                const filtered = this.applyFilters(harvestData, { ...baseFilters, ciclo: undefined });
 
-            // Calculate yield for this cycle
-            const dashboardStats = this.getCosechaDashboardStats(filtered);
+                const propiosFiltered = filtered.filter(r => {
+                    const clasif = (r.clasifica || '').toUpperCase();
+                    return PROPIA_KEYWORDS.some(k => clasif.includes(k.toUpperCase()));
+                });
 
-            // Populate predioHistory mapping
-            dashboardStats.predios.forEach(predio => {
-                const predioName = predio.name;
-                if (!predioHistory[predioName]) {
-                    predioHistory[predioName] = new Array(cycles.length).fill(null);
-                }
-                predioHistory[predioName][i] = predio.kg;
-            });
+                const dashboardStats = this.getCosechaDashboardStats(propiosFiltered);
+
+                dashboardStats.predios.forEach(predio => {
+                    const predioName = predio.name;
+                    if (!predioHistory[predioName]) {
+                        predioHistory[predioName] = new Array(cycles.length).fill(null);
+                    }
+                    predioHistory[predioName][i] = predio.kg;
+                });
+            } else {
+                // ── Datos de CSV histórico ──
+                const rows = csvData[c] || [];
+                const byPredio = {};
+
+                rows.forEach(r => {
+                    // Solo predios propios (usar columna Predio)
+                    const predioUpper = (r.predio || '').toUpperCase();
+                    if (!PROPIA_KEYWORDS.some(k => predioUpper.includes(k.toUpperCase()))) return;
+
+                    if (!byPredio[r.predio]) byPredio[r.predio] = 0;
+                    byPredio[r.predio] += r.kg;
+                });
+
+                Object.entries(byPredio).forEach(([predio, kg]) => {
+                    if (!predioHistory[predio]) {
+                        predioHistory[predio] = new Array(cycles.length).fill(null);
+                    }
+                    predioHistory[predio][i] = kg;
+                });
+            }
         }
 
         const colors = [
@@ -934,11 +1210,10 @@ export class SofiaApiModel {
             const ds = {
                 label: predioName,
                 data: predioHistory[predioName],
+                backgroundColor: colors[colorIndex % colors.length] + '99',
                 borderColor: colors[colorIndex % colors.length],
-                pointBackgroundColor: colors[colorIndex % colors.length],
-                tension: 0.3,
-                fill: false,
-                borderWidth: 2
+                borderWidth: 1,
+                borderRadius: 4
             };
             colorIndex++;
             return ds;

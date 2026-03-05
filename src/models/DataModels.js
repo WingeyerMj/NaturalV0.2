@@ -8,6 +8,9 @@
  * ═══════════════════════════════════════════════════════════
  */
 
+// ── Base API Configuration ──
+const BASE_API_URL = 'http://localhost:10000/api';
+
 // ── User Model ──
 export class UserModel {
   static ROLES = {
@@ -18,24 +21,49 @@ export class UserModel {
     SUBADMIN: 'Sub-Admin'
   };
 
-  static USERS = [
-    { id: 1, name: 'Carlos Mendoza', email: 'admin@naturalfood.com', password: 'admin123', role: 'Administrador', avatar: 'CM', active: true },
-    { id: 2, name: 'Laura Vásquez', email: 'ingeniero@naturalfood.com', password: 'ing123', role: 'Ingeniero', avatar: 'LV', active: true },
-    { id: 3, name: 'María García', email: 'rrhh@naturalfood.com', password: 'rrhh123', role: 'RRHH', avatar: 'MG', active: true },
-    { id: 4, name: 'Juan Pérez', email: 'carga@naturalfood.com', password: 'carga123', role: 'Carga', avatar: 'JP', active: true },
-    { id: 5, name: 'Roberto Díaz', email: 'subadmin@naturalfood.com', password: 'sub123', role: 'Sub-Admin', avatar: 'RD', active: true },
-    { id: 6, name: 'Ana Martínez', email: 'ana@naturalfood.com', password: 'ana123', role: 'Carga', avatar: 'AM', active: true },
+  static CACHE = [
+    { id: 1, name: 'Admin Natural', email: 'admin@naturalfood.com', password: 'admin', role: 'Administrador', active: true, registeredAt: '2025-01-01' },
+    { id: 2, name: 'Sub Admin', email: 'subadmin@naturalfood.com', password: 'N4tur4lf00d$00', role: 'Sub-Admin', active: true, registeredAt: '2025-01-05' },
+    { id: 3, name: 'Visualizador', email: 'v@naturalfood.com', password: 'v', role: 'Visualizador', active: true, registeredAt: '2025-02-10' },
+    { id: 4, name: 'Ingeniero Laura', email: 'laura@naturalfood.com', password: 'laura', role: 'Ingeniero', active: true, registeredAt: '2025-02-15' }
   ];
 
-  static authenticate(email, password) {
-    const user = this.USERS.find(u => u.email === email && u.password === password);
-    if (user) {
-      const session = { ...user };
-      delete session.password;
-      localStorage.setItem('nf_session', JSON.stringify(session));
-      return session;
+  static async sync() {
+    try {
+      const resp = await fetch(`${BASE_API_URL}/users?includePending=true`);
+      const data = await resp.json();
+      if (Array.isArray(data)) this.CACHE = data;
+    } catch (e) {
+      console.warn('Sync users failed.', e);
     }
-    return null;
+  }
+
+  static async authenticate(email, password) {
+    try {
+      const resp = await fetch(`${BASE_API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        localStorage.setItem('nf_session', JSON.stringify(data.user));
+        return data.user;
+      }
+      if (data.pending) return { pending: true };
+      return null;
+    } catch (e) {
+      console.warn('Backend reach error, using static fallback:', e);
+      const user = this.CACHE.find(u => u.email === email && u.password === password);
+      if (user) {
+        if (!user.active) return { pending: true };
+        const session = { ...user };
+        delete session.password;
+        localStorage.setItem('nf_session', JSON.stringify(session));
+        return session;
+      }
+      return null;
+    }
   }
 
   static getCurrentUser() {
@@ -47,43 +75,141 @@ export class UserModel {
     localStorage.removeItem('nf_session');
   }
 
-  static getAll() {
-    return this.USERS.map(u => {
-      const { password, ...user } = u;
-      return user;
-    });
+  static async getAll(options = {}) {
+    try {
+      let url = `${BASE_API_URL}/users`;
+      if (options.includePending) url += '?includePending=true';
+      const resp = await fetch(url);
+      return await resp.json();
+    } catch (e) {
+      console.warn('Backend reach error, using static fallback:', e);
+      let users = [...this.CACHE];
+      if (!options.includePending) {
+        users = users.filter(u => !u.pending && u.active);
+      }
+      return users.map(u => {
+        const { password, ...user } = u;
+        return user;
+      });
+    }
   }
 
   static add(userData) {
-    const newId = Math.max(...this.USERS.map(u => u.id)) + 1;
+    const newId = Math.max(...this.CACHE.map(u => u.id)) + 1;
     const avatar = userData.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-    const newUser = { id: newId, ...userData, avatar, active: true };
-    this.USERS.push(newUser);
+    const newUser = { id: newId, ...userData, avatar, active: userData.active !== undefined ? userData.active : true };
+    this.CACHE.push(newUser);
     return newUser;
   }
 
-  static update(id, userData) {
-    const idx = this.USERS.findIndex(u => u.id === id);
-    if (idx !== -1) {
-      this.USERS[idx] = { ...this.USERS[idx], ...userData };
-      return this.USERS[idx];
+  static async register(name, email, password) {
+    try {
+      const resp = await fetch(`${BASE_API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+      return await resp.json();
+    } catch (e) {
+      console.warn('Backend reach error, using static fallback:', e);
+      const exists = this.CACHE.find(u => u.email === email);
+      if (exists) return { error: 'Este correo ya está registrado.' };
+
+      const newUser = this.add({ name, email, password, role: 'Sub-Admin', active: false, pending: true, registeredAt: new Date().toISOString() });
+
+      NotificationModel.add({
+        title: 'Nueva solicitud de registro',
+        message: `${name} (${email}) solicita acceso como Sub-Administrador.`,
+        type: 'info',
+        time: 'Ahora',
+        read: false,
+        actionType: 'approve_user',
+        actionUserId: newUser.id
+      });
+
+      return { success: true, user: newUser };
     }
-    return null;
   }
 
-  static delete(id) {
-    const idx = this.USERS.findIndex(u => u.id === id);
-    if (idx !== -1) {
-      this.USERS[idx].active = false;
-      return true;
+  static async approveUser(id) {
+    try {
+      const resp = await fetch(`${BASE_API_URL}/users/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        NotificationModel.removeByActionUserId(id);
+      }
+      return data.success;
+    } catch (e) {
+      console.warn('Sync fallback for approval', e);
+      const user = this.CACHE.find(u => u.id === id);
+      if (user) {
+        user.active = true;
+        user.pending = false;
+        NotificationModel.removeByActionUserId(id);
+        return true;
+      }
+      return false;
     }
-    return false;
+  }
+
+  static async rejectUser(id) {
+    try {
+      const resp = await fetch(`${BASE_API_URL}/users/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        NotificationModel.removeByActionUserId(id);
+      }
+      return data.success;
+    } catch (e) {
+      const idx = this.CACHE.findIndex(u => u.id === id);
+      if (idx !== -1) {
+        this.CACHE.splice(idx, 1);
+        NotificationModel.removeByActionUserId(id);
+        return true;
+      }
+      return false;
+    }
+  }
+
+  static async update(id, userData) {
+    try {
+      const resp = await fetch(`${BASE_API_URL}/users/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+      return await resp.json();
+    } catch (e) {
+      const idx = this.CACHE.findIndex(u => u.id === id);
+      if (idx !== -1) {
+        this.CACHE[idx] = { ...this.CACHE[idx], ...userData };
+        return this.CACHE[idx];
+      }
+      return null;
+    }
+  }
+
+  static async delete(id) {
+    return await this.update(id, { active: false });
+  }
+
+  static async getPendingUsers() {
+    const all = await this.getAll({ includePending: true });
+    return all.filter(u => u.pending && !u.active);
   }
 }
 
 // ── Finca (Farm) Model ──
 export class FincaModel {
-  static FINCAS = [
+  static CACHE = [
     { id: 1, name: 'Finca La Esperanza', location: 'San Martín, Mendoza', hectares: 120, predios: 8, status: 'active', manager: 'Carlos Mendoza' },
     { id: 2, name: 'Finca El Sol', location: 'Junín, Mendoza', hectares: 85, predios: 5, status: 'active', manager: 'Laura Vásquez' },
     { id: 3, name: 'Finca Las Viñas', location: 'Rivadavia, San Juan', hectares: 200, predios: 12, status: 'active', manager: 'Carlos Mendoza' },
@@ -91,51 +217,25 @@ export class FincaModel {
     { id: 5, name: 'Finca Valle Grande', location: 'Caucete, San Juan', hectares: 150, predios: 9, status: 'active', manager: 'Laura Vásquez' },
   ];
 
-  static getAll() {
-    return [...this.FINCAS];
+  static async sync() {
+    try {
+      const resp = await fetch(`${BASE_API_URL}/fincas`);
+      const data = await resp.json();
+      if (Array.isArray(data)) this.CACHE = data;
+    } catch (e) { console.warn('Sync fincas failed, using cache/static.', e); }
   }
 
-  static getById(id) {
-    return this.FINCAS.find(f => f.id === id);
-  }
-
-  static getActive() {
-    return this.FINCAS.filter(f => f.status === 'active');
-  }
-
+  static getAll() { return [...this.CACHE]; }
+  static getById(id) { return this.CACHE.find(f => f.id === id); }
+  static getActive() { return this.CACHE.filter(f => f.status === 'active'); }
   static getTotalHectares() {
-    return this.FINCAS.filter(f => f.status === 'active').reduce((sum, f) => sum + f.hectares, 0);
-  }
-
-  static add(fincaData) {
-    const newId = Math.max(...this.FINCAS.map(f => f.id)) + 1;
-    const newFinca = { id: newId, ...fincaData, status: 'active' };
-    this.FINCAS.push(newFinca);
-    return newFinca;
-  }
-
-  static update(id, fincaData) {
-    const idx = this.FINCAS.findIndex(f => f.id === id);
-    if (idx !== -1) {
-      this.FINCAS[idx] = { ...this.FINCAS[idx], ...fincaData };
-      return this.FINCAS[idx];
-    }
-    return null;
-  }
-
-  static delete(id) {
-    const idx = this.FINCAS.findIndex(f => f.id === id);
-    if (idx !== -1) {
-      this.FINCAS[idx].status = 'inactive';
-      return true;
-    }
-    return false;
+    return this.getActive().reduce((sum, f) => sum + Number(f.hectares), 0);
   }
 }
 
 // ── Predio (Plot) Model ──
 export class PredioModel {
-  static PREDIOS = [
+  static CACHE = [
     { id: 1, fincaId: 1, name: 'Parcela Norte A', hectares: 15, variety: 'Flame Seedless', irrigationType: 'Goteo', soilType: 'Franco-arenoso', status: 'active' },
     { id: 2, fincaId: 1, name: 'Parcela Norte B', hectares: 18, variety: 'Superior Seedless', irrigationType: 'Goteo', soilType: 'Franco', status: 'active' },
     { id: 3, fincaId: 1, name: 'Parcela Sur A', hectares: 12, variety: 'Sultanina', irrigationType: 'Aspersión', soilType: 'Franco-arcilloso', status: 'active' },
@@ -148,30 +248,22 @@ export class PredioModel {
     { id: 10, fincaId: 5, name: 'Area Sur', hectares: 40, variety: 'Sultanina', irrigationType: 'Aspersión', soilType: 'Franco', status: 'active' },
   ];
 
-  static getAll() { return [...this.PREDIOS]; }
-  static getByFinca(fincaId) { return this.PREDIOS.filter(p => p.fincaId === fincaId); }
-  static getById(id) { return this.PREDIOS.find(p => p.id === id); }
-
-  static add(predioData) {
-    const newId = Math.max(...this.PREDIOS.map(p => p.id)) + 1;
-    const newPredio = { id: newId, ...predioData, status: 'active' };
-    this.PREDIOS.push(newPredio);
-    return newPredio;
+  static async sync() {
+    try {
+      const resp = await fetch(`${BASE_API_URL}/predios`);
+      const data = await resp.json();
+      if (Array.isArray(data)) this.CACHE = data;
+    } catch (e) { console.warn('Sync predios failed.', e); }
   }
 
-  static delete(id) {
-    const idx = this.PREDIOS.findIndex(p => p.id === id);
-    if (idx !== -1) {
-      this.PREDIOS[idx].status = 'inactive';
-      return true;
-    }
-    return false;
-  }
+  static getAll() { return [...this.CACHE]; }
+  static getByFinca(fincaId) { return this.CACHE.filter(p => p.finca_id === fincaId || p.fincaId === fincaId); }
+  static getById(id) { return this.CACHE.find(p => p.id === id); }
 }
 
 // ── Variedad (Grape Variety) Model ──
 export class VariedadModel {
-  static VARIEDADES = [
+  static CACHE = [
     { id: 1, name: 'Flame Seedless', type: 'Roja', daysToHarvest: 115, sugarContent: '18-20°Brix', usage: 'Pasa / Mesa', status: 'active' },
     { id: 2, name: 'Superior Seedless', type: 'Verde', daysToHarvest: 120, sugarContent: '16-18°Brix', usage: 'Mesa', status: 'active' },
     { id: 3, name: 'Sultanina', type: 'Verde', daysToHarvest: 110, sugarContent: '20-22°Brix', usage: 'Pasa', status: 'active' },
@@ -180,20 +272,21 @@ export class VariedadModel {
     { id: 6, name: 'Red Globe', type: 'Roja', daysToHarvest: 140, sugarContent: '15-17°Brix', usage: 'Mesa', status: 'inactive' },
   ];
 
-  static getAll() { return [...this.VARIEDADES]; }
-  static getActive() { return this.VARIEDADES.filter(v => v.status === 'active'); }
-
-  static add(variedadData) {
-    const newId = Math.max(...this.VARIEDADES.map(v => v.id)) + 1;
-    const newVariedad = { id: newId, ...variedadData, status: 'active' };
-    this.VARIEDADES.push(newVariedad);
-    return newVariedad;
+  static async sync() {
+    try {
+      const resp = await fetch(`${BASE_API_URL}/variedades`);
+      const data = await resp.json();
+      if (Array.isArray(data)) this.CACHE = data;
+    } catch (e) { console.warn('Sync variedades failed.', e); }
   }
+
+  static getAll() { return [...this.CACHE]; }
+  static getActive() { return this.CACHE.filter(v => v.status === 'active'); }
 }
 
 // ── Empleado (Employee) Model ──
 export class EmpleadoModel {
-  static EMPLEADOS = [
+  static CACHE = [
     { id: 1, legajo: 'EMP-001', name: 'Pedro Sánchez', dni: '30245678', position: 'Capataz', finca: 'Finca La Esperanza', startDate: '2020-03-15', status: 'active', salary: 280000 },
     { id: 2, legajo: 'EMP-002', name: 'Miguel Ángel Torres', dni: '32456789', position: 'Peón Rural', finca: 'Finca La Esperanza', startDate: '2021-06-01', status: 'active', salary: 220000 },
     { id: 3, legajo: 'EMP-003', name: 'Rosa Fernández', dni: '28345612', position: 'Encargada de Poda', finca: 'Finca El Sol', startDate: '2019-11-20', status: 'active', salary: 250000 },
@@ -204,32 +297,23 @@ export class EmpleadoModel {
     { id: 8, legajo: 'EMP-008', name: 'Ramón Ortega', dni: '27654321', position: 'Capataz', finca: 'Finca El Sol', startDate: '2017-09-30', status: 'active', salary: 290000 },
   ];
 
-  static getAll() { return [...this.EMPLEADOS]; }
-  static getActive() { return this.EMPLEADOS.filter(e => e.status === 'active'); }
-  static getById(id) { return this.EMPLEADOS.find(e => e.id === id); }
-  static getByFinca(finca) { return this.EMPLEADOS.filter(e => e.finca === finca); }
-
-  static add(empleadoData) {
-    const newId = Math.max(...this.EMPLEADOS.map(e => e.id)) + 1;
-    const legajo = `EMP-${String(newId).padStart(3, '0')}`;
-    const newEmpleado = { id: newId, legajo, ...empleadoData, status: 'active' };
-    this.EMPLEADOS.push(newEmpleado);
-    return newEmpleado;
+  static async sync() {
+    try {
+      const resp = await fetch(`${BASE_API_URL}/empleados`);
+      const data = await resp.json();
+      if (Array.isArray(data)) this.CACHE = data;
+    } catch (e) { console.warn('Sync empleados failed.', e); }
   }
 
-  static delete(id) {
-    const idx = this.EMPLEADOS.findIndex(e => e.id === id);
-    if (idx !== -1) {
-      this.EMPLEADOS[idx].status = 'inactive';
-      return true;
-    }
-    return false;
-  }
+  static getAll() { return [...this.CACHE]; }
+  static getActive() { return this.CACHE.filter(e => e.status === 'active'); }
+  static getById(id) { return this.CACHE.find(e => e.id === id); }
+  static getByFinca(finca) { return this.CACHE.filter(e => e.finca === finca); }
 }
 
 // ── Labor (Field Work) Model ──
 export class LaborModel {
-  static LABORES = [
+  static CACHE = [
     { id: 1, date: '2026-02-10', type: 'Poda', predio: 'Parcela Norte A', finca: 'Finca La Esperanza', employee: 'Pedro Sánchez', hours: 8, notes: 'Poda de formación completada', status: 'completed' },
     { id: 2, date: '2026-02-10', type: 'Riego', predio: 'Sector Este 1', finca: 'Finca El Sol', employee: 'Rosa Fernández', hours: 6, notes: 'Riego por goteo - turno mañana', status: 'completed' },
     { id: 3, date: '2026-02-09', type: 'Fumigación', predio: 'Lote 1', finca: 'Finca Las Viñas', employee: 'Diego López', hours: 7, notes: 'Aplicación de fungicida preventivo', status: 'completed' },
@@ -242,15 +326,23 @@ export class LaborModel {
     { id: 10, date: '2026-02-11', type: 'Fumigación', predio: 'Sector Este 1', finca: 'Finca El Sol', employee: 'Rosa Fernández', hours: 0, notes: 'Aplicación programada', status: 'pending' },
   ];
 
-  static getAll() { return [...this.LABORES]; }
-  static getCompleted() { return this.LABORES.filter(l => l.status === 'completed'); }
-  static getPending() { return this.LABORES.filter(l => l.status === 'pending'); }
-  static getByFinca(finca) { return this.LABORES.filter(l => l.finca === finca); }
-  static getByEmployee(employee) { return this.LABORES.filter(l => l.employee === employee); }
+  static async sync() {
+    try {
+      const resp = await fetch(`${BASE_API_URL}/labores`);
+      const data = await resp.json();
+      if (Array.isArray(data)) this.CACHE = data;
+    } catch (e) { console.warn('Sync labores failed.', e); }
+  }
+
+  static getAll() { return [...this.CACHE]; }
+  static getCompleted() { return this.CACHE.filter(l => l.status === 'completed'); }
+  static getPending() { return this.CACHE.filter(l => l.status === 'pending'); }
+  static getByFinca(finca) { return this.CACHE.filter(l => l.finca === finca || l.finca_name === finca); }
+  static getByEmployee(employee) { return this.CACHE.filter(l => l.employee === employee || l.employee_name === employee); }
 
   static getByType() {
     const counts = {};
-    this.LABORES.forEach(l => {
+    this.CACHE.forEach(l => {
       counts[l.type] = (counts[l.type] || 0) + 1;
     });
     return counts;
@@ -258,23 +350,17 @@ export class LaborModel {
 
   static getHoursByFinca() {
     const hours = {};
-    this.LABORES.filter(l => l.status === 'completed').forEach(l => {
-      hours[l.finca] = (hours[l.finca] || 0) + l.hours;
+    this.CACHE.filter(l => l.status === 'completed').forEach(l => {
+      const fn = l.finca_name || l.finca;
+      hours[fn] = (hours[fn] || 0) + Number(l.hours);
     });
     return hours;
-  }
-
-  static add(laborData) {
-    const newId = Math.max(...this.LABORES.map(l => l.id)) + 1;
-    const newLabor = { id: newId, ...laborData };
-    this.LABORES.unshift(newLabor);
-    return newLabor;
   }
 }
 
 // ── Presupuesto (Budget) Model ──
 export class PresupuestoModel {
-  static PRESUPUESTOS = [
+  static CACHE = [
     { id: 1, category: 'Mano de Obra', planned: 2500000, executed: 2180000, month: 'Enero 2026' },
     { id: 2, category: 'Insumos Agroquímicos', planned: 1800000, executed: 1950000, month: 'Enero 2026' },
     { id: 3, category: 'Riego y Energía', planned: 800000, executed: 720000, month: 'Enero 2026' },
@@ -287,20 +373,18 @@ export class PresupuestoModel {
     { id: 10, category: 'Transporte', planned: 650000, executed: 600000, month: 'Febrero 2026' },
   ];
 
-  static getAll() { return [...this.PRESUPUESTOS]; }
-
-  static getByMonth(month) {
-    return this.PRESUPUESTOS.filter(p => p.month === month);
+  static async sync() {
+    try {
+      const resp = await fetch(`${BASE_API_URL}/presupuestos`);
+      const data = await resp.json();
+      if (Array.isArray(data)) this.CACHE = data;
+    } catch (e) { console.warn('Sync presupuestos failed.', e); }
   }
 
-  static getTotalPlanned() {
-    return this.PRESUPUESTOS.reduce((sum, p) => sum + p.planned, 0);
-  }
-
-  static getTotalExecuted() {
-    return this.PRESUPUESTOS.reduce((sum, p) => sum + p.executed, 0);
-  }
-
+  static getAll() { return [...this.CACHE]; }
+  static getByMonth(month) { return this.CACHE.filter(p => p.month === month); }
+  static getTotalPlanned() { return this.CACHE.reduce((sum, p) => sum + Number(p.planned), 0); }
+  static getTotalExecuted() { return this.CACHE.reduce((sum, p) => sum + Number(p.executed), 0); }
   static getExecutionPercentage() {
     const planned = this.getTotalPlanned();
     const executed = this.getTotalExecuted();
@@ -309,20 +393,20 @@ export class PresupuestoModel {
 
   static getByCategory() {
     const result = {};
-    this.PRESUPUESTOS.forEach(p => {
+    this.CACHE.forEach(p => {
       if (!result[p.category]) {
         result[p.category] = { planned: 0, executed: 0 };
       }
-      result[p.category].planned += p.planned;
-      result[p.category].executed += p.executed;
+      result[p.category].planned += Number(p.planned);
+      result[p.category].executed += Number(p.executed);
     });
     return result;
   }
 }
 
-// ── Aplicaciones (Applications/Treatments) Model ──
+// ── Aplicacion (Applications/Treatments) Model ──
 export class AplicacionModel {
-  static APLICACIONES = [
+  static CACHE = [
     { id: 1, product: 'Fungicida Mancozeb', dose: '2.5 kg/ha', predio: 'Parcela Norte A', date: '2026-02-03', status: 'applied', engineer: 'Laura Vásquez' },
     { id: 2, product: 'Insecticida Lambda', dose: '0.8 L/ha', predio: 'Sector Este 1', date: '2026-02-05', status: 'applied', engineer: 'Laura Vásquez' },
     { id: 3, product: 'Fertilizante NPK', dose: '15 kg/ha', predio: 'Lote 1', date: '2026-02-07', status: 'applied', engineer: 'Laura Vásquez' },
@@ -330,16 +414,17 @@ export class AplicacionModel {
     { id: 5, product: 'Regulador de Crecimiento', dose: '1.2 L/ha', predio: 'Parcela Norte B', date: '2026-02-12', status: 'scheduled', engineer: 'Laura Vásquez' },
   ];
 
-  static getAll() { return [...this.APLICACIONES]; }
-  static getApplied() { return this.APLICACIONES.filter(a => a.status === 'applied'); }
-  static getPending() { return this.APLICACIONES.filter(a => a.status !== 'applied'); }
-
-  static add(aplicacionData) {
-    const newId = Math.max(...this.APLICACIONES.map(a => a.id)) + 1;
-    const newAplicacion = { id: newId, ...aplicacionData };
-    this.APLICACIONES.push(newAplicacion);
-    return newAplicacion;
+  static async sync() {
+    try {
+      const resp = await fetch(`${BASE_API_URL}/aplicaciones`);
+      const data = await resp.json();
+      if (Array.isArray(data)) this.CACHE = data;
+    } catch (e) { console.warn('Sync aplicaciones failed.', e); }
   }
+
+  static getAll() { return [...this.CACHE]; }
+  static getApplied() { return this.CACHE.filter(a => a.status === 'applied'); }
+  static getPending() { return this.CACHE.filter(a => a.status !== 'applied'); }
 }
 
 // ── Notification Model ──
@@ -351,7 +436,7 @@ export class NotificationModel {
     { id: 4, title: 'Nuevo empleado', message: 'Se registró a Valentina Castro como Peón Rural', type: 'info', time: 'Hace 2 días', read: true },
   ];
 
-  static getAll() { return [...this.NOTIFICATIONS]; }
+  static async getAll() { return [...this.NOTIFICATIONS]; }
   static getUnread() { return this.NOTIFICATIONS.filter(n => !n.read); }
   static markAsRead(id) {
     const notif = this.NOTIFICATIONS.find(n => n.id === id);
@@ -359,5 +444,14 @@ export class NotificationModel {
   }
   static markAllRead() {
     this.NOTIFICATIONS.forEach(n => n.read = true);
+  }
+  static add(notifData) {
+    const newId = this.NOTIFICATIONS.length > 0 ? Math.max(...this.NOTIFICATIONS.map(n => n.id)) + 1 : 1;
+    const notif = { id: newId, ...notifData };
+    this.NOTIFICATIONS.unshift(notif);
+    return notif;
+  }
+  static removeByActionUserId(userId) {
+    this.NOTIFICATIONS = this.NOTIFICATIONS.filter(n => n.actionUserId !== userId);
   }
 }
