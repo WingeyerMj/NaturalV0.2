@@ -160,6 +160,14 @@ export function renderLoginPage() {
           ⚠️ <span>Credenciales incorrectas. Intente nuevamente.</span>
         </div>
 
+        <div class="form-success" id="login-success" style="display:none; background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); border-radius: 8px; padding: var(--space-4); margin-bottom: var(--space-4); color: #22c55e; font-size: 0.9em; text-align: center;">
+          ✅ <span id="login-success-msg">Registro exitoso</span>
+        </div>
+
+        <div class="form-error" id="login-pending-error" style="display:none; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; padding: var(--space-4); margin-bottom: var(--space-4); color: #f59e0b; font-size: 0.9em; text-align: center;">
+          ⏳ <span>Tu cuenta está pendiente de aprobación por el administrador.</span>
+        </div>
+
         <form id="login-form" autocomplete="off">
           <div class="form-group">
             <label class="form-label" for="login-email">Correo electrónico</label>
@@ -196,18 +204,71 @@ export function renderLoginPage() {
           </button>
         </form>
 
+        <div style="margin-top: var(--space-4); text-align: center;">
+          <p style="font-size: var(--text-sm); color: var(--text-tertiary); margin-bottom: var(--space-3);">¿No tenés cuenta?</p>
+          <button class="btn btn-ghost" id="btn-show-register" style="color: var(--color-primary-400); font-weight: 600; border: 1px solid var(--color-primary-400); width: 100%; padding: var(--space-3); border-radius: var(--radius-lg); transition: all 0.2s ease;">
+            📝 Registrarse
+          </button>
+        </div>
+
         <div class="login-footer">
           <a href="#" id="btn-back-landing">← Volver al inicio</a>
         </div>
+      </div>
 
-        <div style="margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle);">
-          <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-bottom: var(--space-3); text-align: center;">Cuentas de demostración:</p>
-          <div style="display: grid; gap: var(--space-2); font-size: var(--text-xs); color: var(--text-tertiary);">
-            <div style="display: flex; justify-content: space-between;"><span>Admin:</span><code style="color: var(--color-primary-400);">admin@naturalfood.com / admin123</code></div>
-            <div style="display: flex; justify-content: space-between;"><span>Ingeniero:</span><code style="color: var(--color-primary-400);">ingeniero@naturalfood.com / ing123</code></div>
-            <div style="display: flex; justify-content: space-between;"><span>RRHH:</span><code style="color: var(--color-primary-400);">rrhh@naturalfood.com / rrhh123</code></div>
-            <div style="display: flex; justify-content: space-between;"><span>Carga:</span><code style="color: var(--color-primary-400);">carga@naturalfood.com / carga123</code></div>
-            <div style="display: flex; justify-content: space-between;"><span>Sub-Admin:</span><code style="color: var(--color-primary-400);">subadmin@naturalfood.com / sub123</code></div>
+      <!-- Registration Modal -->
+      <div id="register-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+        <div style="background: var(--bg-secondary); border-radius: 16px; padding: var(--space-8); max-width: 480px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid var(--border-subtle);">
+          <div style="text-align: center; margin-bottom: var(--space-6);">
+            <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" style="width: 60px; height: 60px; margin-bottom: var(--space-3);">
+            <h3 style="font-family: 'Outfit'; color: var(--text-primary); margin-bottom: var(--space-1);">Crear Cuenta</h3>
+            <p style="font-size: var(--text-sm); color: var(--text-tertiary);">Completá tus datos para solicitar acceso</p>
+          </div>
+
+          <div class="form-error" id="register-error" style="display:none; margin-bottom: var(--space-4);">
+            ⚠️ <span id="register-error-msg"></span>
+          </div>
+
+          <form id="form-register" autocomplete="off">
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+              <label class="form-label" for="register-name">Nombre Completo</label>
+              <div class="form-input-wrapper">
+                <input type="text" id="register-name" class="form-input" placeholder="Ej: Juan Pérez" required />
+                <span class="form-input-icon">👤</span>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+              <label class="form-label" for="register-email">Correo Electrónico</label>
+              <div class="form-input-wrapper">
+                <input type="email" id="register-email" class="form-input" placeholder="tucorreo@ejemplo.com" required />
+                <span class="form-input-icon">📧</span>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+              <label class="form-label" for="register-password">Contraseña</label>
+              <div class="form-input-wrapper">
+                <input type="password" id="register-password" class="form-input" placeholder="Mínimo 6 caracteres" required minlength="6" />
+                <span class="form-input-icon">🔒</span>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: var(--space-6);">
+              <label class="form-label" for="register-password-confirm">Confirmar Contraseña</label>
+              <div class="form-input-wrapper">
+                <input type="password" id="register-password-confirm" class="form-input" placeholder="Repetí tu contraseña" required minlength="6" />
+                <span class="form-input-icon">🔒</span>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary login-btn" style="width: 100%;">
+              Solicitar Acceso
+            </button>
+          </form>
+
+          <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-4); text-align: center; line-height: 1.5;">
+            Tu solicitud será revisada por un administrador.<br>Recibirás un correo cuando tu cuenta sea activada.
+          </p>
+
+          <div style="text-align: center; margin-top: var(--space-4);">
+            <a href="#" id="btn-cancel-register" style="color: var(--text-tertiary); font-size: var(--text-sm); text-decoration: none;">← Volver al inicio de sesión</a>
           </div>
         </div>
       </div>
@@ -897,18 +958,19 @@ export function renderInformePresupuesto(budgetData) {
   `;
 }
 
-export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCycle = '2025-2026') {
+export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCycle = '2025-2026', userRole = 'Administrador') {
   const fmt = (v) => new Intl.NumberFormat('es-AR').format(Math.round(v));
   const fmtDec = (v) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 1 }).format(v);
   const fmtMoney = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(v);
 
   const totalJornadas = laborStats.reduce((acc, s) => acc + s.totalJornadas, 0);
+  const isAdmin = userRole === 'Administrador';
 
   const cycles = ['2025-2026', '2024-2025', '2023-2024', '2022-2023', '2021-2022'];
 
   return `
     <div class="dashboard-grid animate-fade-in" style="margin-bottom: var(--space-6);">
-      <!-- Budget Upload Zone -->
+      ${isAdmin ? `<!-- Budget Upload Zone -->
       <div class="sofia-upload-zone" id="jornales-budget-upload" style="margin: 0; padding: var(--space-6); background: var(--bg-glass); display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <div style="font-size: 2.5rem; margin-bottom: var(--space-2);">📄</div>
         <h4 style="font-family: 'Outfit'; margin-bottom: var(--space-1);">Presupuesto de Jornales</h4>
@@ -917,7 +979,7 @@ export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCyc
         <button class="btn btn-secondary btn-sm" onclick="document.getElementById('input-budget-csv').click()">
           Seleccionar CSV
         </button>
-      </div>
+      </div>` : ''}
 
       <!-- Chart Container -->
       <div class="data-table-container" style="margin: 0; padding: var(--space-6);">
@@ -984,7 +1046,7 @@ export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCyc
     <div class="data-table-container animate-fade-in animate-delay-3">
       <div class="table-header" style="justify-content: space-between;">
         <h3 style="display: flex; align-items: center; gap: var(--space-3);">
-          💲 Costo Total por Predio (ARS)
+          💲 Costo Total por Predio
           <select id="table-jornales-cycle" class="form-select" style="font-size: 0.8em; padding: 4px 8px; width: auto; background: var(--bg-secondary);">
             ${cycles.map(c => `<option value="${c}" ${c === currentCycle ? 'selected' : ''}>${c}</option>`).join('')}
           </select>
@@ -993,18 +1055,20 @@ export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCyc
       <table class="data-table">
         <thead>
           <tr>
-            <th>Predio</th>
             <th>Finca</th>
+            <th>Predio</th>
             <th style="text-align: right;">Costo Total (ARS)</th>
+            <th style="text-align: right;">Costo Total (USD)</th>
             <th style="text-align: right;">Jornadas</th>
           </tr>
         </thead>
         <tbody>
           ${efficiencyStats.predios.slice().sort((a, b) => b.costoArs - a.costoArs).map(p => `
               <tr>
-                <td><strong>${p.name}</strong></td>
                 <td><span style="font-size: 0.9em; color: var(--text-tertiary);">${p.group}</span></td>
+                <td><strong>${p.name}</strong></td>
                 <td style="text-align: right; color: var(--color-primary-500); font-weight: 600;">${fmtMoney(p.costoArs)}</td>
+                <td style="text-align: right; color: #22c55e; font-weight: 600;">US${fmtMoney(p.costoUsd || 0)}</td>
                 <td style="text-align: right;">${fmt(p.jornales)}</td>
               </tr>
             `).join('')}
@@ -1013,6 +1077,7 @@ export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCyc
           <tr>
             <td colspan="2">TOTAL</td>
             <td style="text-align: right; color: var(--color-primary-600);">${fmtMoney(efficiencyStats.predios.reduce((acc, p) => acc + p.costoArs, 0))}</td>
+            <td style="text-align: right; color: #16a34a;">US${fmtMoney(efficiencyStats.predios.reduce((acc, p) => acc + (p.costoUsd || 0), 0))}</td>
             <td style="text-align: right;">${fmt(efficiencyStats.predios.reduce((acc, p) => acc + p.jornales, 0))}</td>
           </tr>
         </tfoot>
@@ -1335,55 +1400,11 @@ export function renderPresupuestoView(presupuestos) {
   `;
 }
 
-// ── Usuarios View ──
-export function renderUsuariosView(usuarios) {
-  return `
-    <div class="data-table-container animate-fade-in">
-      <div class="table-header">
-        <h3>Gestión de Usuarios</h3>
-        <div class="table-actions">
-          <button class="btn btn-primary btn-sm" id="btn-add-usuario">+ Nuevo Usuario</button>
-        </div>
-      </div>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Avatar</th>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Rol</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${usuarios.map(u => `
-            <tr>
-              <td>
-                <div class="sidebar-avatar" style="width: 32px; height: 32px; font-size: var(--text-xs);">${u.avatar}</div>
-              </td>
-              <td><strong>${u.name}</strong></td>
-              <td style="color: var(--text-secondary);">${u.email}</td>
-              <td>
-                <span class="status-badge ${u.role === 'Administrador' ? 'active' : 'pending'}" style="background: rgba(168, 85, 247, 0.1); color: var(--color-accent-400);">
-                  ${u.role}
-                </span>
-              </td>
-              <td>
-                <span class="status-badge ${u.active ? 'active' : 'inactive'}">
-                  <span class="status-dot"></span>
-                  ${u.active ? 'Activo' : 'Inactivo'}
-                </span>
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
+// renderUsuariosView movida al final del archivo
 
-export function renderCosechaDashboard(stats) {
+export function renderCosechaDashboard(stats, userRole = 'Administrador') {
   const formatKg = (v) => new Intl.NumberFormat('es-AR').format(Math.round(v));
+  const isAdmin = userRole === 'Administrador';
 
   return `
     <div class="dashboard-grid animate-fade-in" style="margin-bottom: var(--space-6);">
@@ -1414,6 +1435,17 @@ export function renderCosechaDashboard(stats) {
         <div class="metric-label">VARIEDADES</div>
         <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Tipos de uva cosechados</p>
       </div>
+
+      ${isAdmin ? `<div class="metric-card">
+        <div class="metric-card-header">
+          <div class="metric-card-icon blue">🎯</div>
+        </div>
+        <div class="metric-value">
+            <input type="number" id="input-expectativa" class="form-input" style="width: 100px; font-size: 0.8em; font-weight: bold; background: transparent; border: 1px solid var(--border-subtle); padding: 5px; color: var(--text-primary); border-radius: 4px;" placeholder="Ej: 1500000" value="${stats.expectativaKg || ''}">
+            <small style="font-size: 0.5em; color: var(--text-tertiary);">kg</small>
+        </div>
+        <div class="metric-label">EXPECTATIVA DEL CICLO</div>
+      </div>` : ''}
     </div>
 
     <!-- Lists Row -->
@@ -1522,6 +1554,14 @@ export function renderCosechaDashboard(stats) {
                 <option value="2022-2023">2022-2023</option>
                 <option value="2021-2022">2021-2022</option>
                 <option value="2020-2021">2020-2021</option>
+                <option value="2019-2020">2019-2020</option>
+                <option value="2018-2019">2018-2019</option>
+                <option value="2017-2018">2017-2018</option>
+                <option value="2016-2017">2016-2017</option>
+                <option value="2015-2016">2015-2016</option>
+                <option value="2014-2015">2014-2015</option>
+                <option value="2013-2014">2013-2014</option>
+                <option value="2012-2013">2012-2013</option>
             </select>
         </div>
     </div>
@@ -1603,7 +1643,7 @@ export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentC
          </select>
          <label class="form-label" style="margin:0; margin-left: var(--space-2); font-size: 0.85em;">Ciclo:</label>
          <select class="form-select sofia-filter-select" id="filter-cl-ciclo" style="padding: 4px 12px; font-size: 0.9em;">
-            ${['2025-2026', '2024-2025', '2023-2024', '2022-2023', '2021-2022', '2020-2021'].map(c =>
+            ${['2025-2026', '2024-2025', '2023-2024', '2022-2023', '2021-2022', '2020-2021', '2019-2020', '2018-2019', '2017-2018', '2016-2017', '2015-2016', '2014-2015', '2013-2014', '2012-2013'].map(c =>
     `<option value="${c}" ${currentCiclo === c ? 'selected' : ''}>${c}</option>`
   ).join('')}
          </select>
@@ -2073,31 +2113,49 @@ export function renderFertilizacionComparativa(data) {
       <div class="chart-container" style="min-height: 400px; padding: var(--space-6); grid-column: 1 / -1;">
           <div class="chart-header" style="color: var(--color-primary-400); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3);">
             <span class="chart-title">📈 🍇 El Espejo — Aplicación Semanal (L)</span>
-            <div style="display: flex; align-items: center; gap: var(--space-2);">
-              <label for="filter-weekly-producto-ee" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Producto:</label>
-              <select id="filter-weekly-producto-ee" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none;">
-                <option value="" style="color:#000;">Todos los productos</option>
-                <option value="NUTRI 1075 M" style="color:#000;">NUTRI 1075 M</option>
-                <option value="NUTRI 1683 M" style="color:#000;">NUTRI 1683 M</option>
-                <option value="NUTRI 1684 M" style="color:#000;">NUTRI 1684 M</option>
-              </select>
+            <div style="display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <label for="filter-weekly-predio-ee" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Predio:</label>
+                <select id="filter-weekly-predio-ee" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none; transition: border-color 0.2s;">
+                  <option value="" style="color:#000;">Todos los predios</option>
+                </select>
+              </div>
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <label for="filter-weekly-producto-ee" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Producto:</label>
+                <select id="filter-weekly-producto-ee" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none;">
+                  <option value="" style="color:#000;">Todos los productos</option>
+                  <option value="NUTRI 1075 M" style="color:#000;">NUTRI 1075 M</option>
+                  <option value="NUTRI 1683 M" style="color:#000;">NUTRI 1683 M</option>
+                  <option value="NUTRI 1684 M" style="color:#000;">NUTRI 1684 M</option>
+                </select>
+              </div>
             </div>
           </div>
+          <div id="weekly-summary-ee" style="display: flex; gap: var(--space-4); flex-wrap: wrap; margin: var(--space-4) 0;"></div>
           <div class="chart-canvas-wrapper" style="height:350px;"><canvas id="chart-fert-weekly-ee"></canvas></div>
       </div>
       <div class="chart-container" style="min-height: 400px; padding: var(--space-6); grid-column: 1 / -1;">
           <div class="chart-header" style="color: var(--color-amber-400); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3);">
             <span class="chart-title">📈 🌾 Fincas Viejas — Aplicación Semanal (L)</span>
-            <div style="display: flex; align-items: center; gap: var(--space-2);">
-              <label for="filter-weekly-producto-fv" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Producto:</label>
-              <select id="filter-weekly-producto-fv" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none;">
-                <option value="" style="color:#000;">Todos los productos</option>
-                <option value="NUTRI 1075 M" style="color:#000;">NUTRI 1075 M</option>
-                <option value="NUTRI 1683 M" style="color:#000;">NUTRI 1683 M</option>
-                <option value="NUTRI 1684 M" style="color:#000;">NUTRI 1684 M</option>
-              </select>
+            <div style="display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <label for="filter-weekly-predio-fv" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Predio:</label>
+                <select id="filter-weekly-predio-fv" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none; transition: border-color 0.2s;">
+                  <option value="" style="color:#000;">Todos los predios</option>
+                </select>
+              </div>
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <label for="filter-weekly-producto-fv" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Producto:</label>
+                <select id="filter-weekly-producto-fv" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none;">
+                  <option value="" style="color:#000;">Todos los productos</option>
+                  <option value="NUTRI 1075 M" style="color:#000;">NUTRI 1075 M</option>
+                  <option value="NUTRI 1683 M" style="color:#000;">NUTRI 1683 M</option>
+                  <option value="NUTRI 1684 M" style="color:#000;">NUTRI 1684 M</option>
+                </select>
+              </div>
             </div>
           </div>
+          <div id="weekly-summary-fv" style="display: flex; gap: var(--space-4); flex-wrap: wrap; margin: var(--space-4) 0;"></div>
           <div class="chart-canvas-wrapper" style="height:350px;"><canvas id="chart-fert-weekly-fv"></canvas></div>
       </div>
     </div>
@@ -2110,7 +2168,7 @@ export function renderFertilizacionComparativa(data) {
     <table class="data-table">
       <thead><tr>
         <th>Predio / Cuartel</th><th>Producto</th><th>Pre-Cos. (L)</th><th>Pos-Cos. (L)</th>
-        <th>Comprado (L)</th><th>Real (L)</th><th>Desvío</th><th>%</th>
+        <th>Comprado (L)</th><th>Real (L)</th><th>Estado</th><th>%</th>
       </tr></thead>
       <tbody>
         ${data.length === 0 ? '<tr><td colspan="8" style="text-align:center;color:var(--text-tertiary);padding:var(--space-8);">Sin registros</td></tr>' :
@@ -2139,8 +2197,8 @@ export function renderFertilizacionComparativa(data) {
             <td>${formatCurrency(r.pos)}</td>
             <td style="font-weight:600;">${formatCurrency(r.metaAnual)}</td>
             <td style="font-weight:600; color:var(--color-accent-400)">${formatCurrency(r.real)}</td>
-            <td><span class="desvio-badge ${r.desvio > 0 ? 'over' : r.desvio < 0 ? 'under' : 'on-target'}">${r.desvio > 0 ? '+' : ''}${formatCurrency(r.desvio)}</span></td>
-            <td><span class="desvio-badge ${r.desvioPct > 0 ? 'over' : r.desvioPct < 0 ? 'under' : 'on-target'}">${r.desvioPct > 0 ? '+' : ''}${r.desvioPct}%</span></td>
+            <td><span class="desvio-badge ${r.desvio > 0 ? 'over' : r.desvio < 0 ? 'under' : 'on-target'}">${r.desvio > 0 ? '⛔ +' : r.desvio < 0 ? '⚠️ ' : '✅ '}${formatCurrency(r.desvio)}</span></td>
+            <td><span class="desvio-badge ${r.desvioPct > 0 ? 'over' : r.desvioPct < 0 ? 'under' : 'on-target'}">${r.desvioPct > 0 ? '⛔ +' : r.desvioPct < 0 ? '⚠️ ' : '✅ '}${r.desvioPct}%</span></td>
           </tr>
           `).join('')}
         `).join('');
@@ -2151,3 +2209,149 @@ export function renderFertilizacionComparativa(data) {
 `;
 }
 
+// ── Gestión de Usuarios View ──
+export function renderUsuariosView(users, roles) {
+  const pendingUsers = users.filter(u => u.pending && !u.active);
+  const regularUsers = users.filter(u => !u.pending || u.active);
+
+  return `
+    ${pendingUsers.length > 0 ? `
+    <div class="data-table-container animate-fade-in" style="margin-bottom: var(--space-6); border: 1px solid rgba(245,158,11,0.3);">
+      <div class="table-header" style="background: rgba(245,158,11,0.08);">
+        <h3 style="display: flex; align-items: center; gap: var(--space-3);">
+          ⏳ Solicitudes Pendientes
+          <span style="background: #f59e0b; color: #000; font-size: 0.7em; padding: 2px 8px; border-radius: 12px; font-weight: 700;">${pendingUsers.length}</span>
+        </h3>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Avatar</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Fecha Solicitud</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pendingUsers.map(u => `
+            <tr data-id="${u.id}">
+              <td>
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8em; color: white;">
+                  ${u.avatar}
+                </div>
+              </td>
+              <td><strong>${u.name}</strong></td>
+              <td><code style="color: var(--color-primary-400); font-size: 0.9em;">${u.email}</code></td>
+              <td style="font-size: 0.85em; color: var(--text-tertiary);">${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString('es-AR') : '—'}</td>
+              <td>
+                <div style="display: flex; gap: var(--space-2);">
+                  <button class="btn btn-sm btn-approve-usuario" data-id="${u.id}" style="background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); padding: 4px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+                    ✅ Aprobar
+                  </button>
+                  <button class="btn btn-sm btn-reject-usuario" data-id="${u.id}" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 4px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+                    ❌ Rechazar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    ` : ''}
+
+    <div class="data-table-container animate-fade-in">
+      <div class="table-header">
+        <h3>👥 Gestión de Usuarios</h3>
+        <div class="table-actions">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Buscar usuario..." id="search-usuarios" />
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-add-usuario">+ Nuevo Usuario</button>
+        </div>
+      </div>
+      <table class="data-table" id="table-usuarios">
+        <thead>
+          <tr>
+            <th>Avatar</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${regularUsers.map(u => `
+            <tr data-id="${u.id}">
+              <td>
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8em; color: white;">
+                  ${u.avatar}
+                </div>
+              </td>
+              <td><strong>${u.name}</strong></td>
+              <td><code style="color: var(--color-primary-400); font-size: 0.9em;">${u.email}</code></td>
+              <td>
+                <span style="padding: 4px 10px; border-radius: 12px; font-size: 0.8em; font-weight: 600;
+                  background: ${u.role === 'Administrador' ? 'rgba(239, 68, 68, 0.15); color: #ef4444' :
+      u.role === 'Ingeniero' ? 'rgba(59, 130, 246, 0.15); color: #3b82f6' :
+        u.role === 'Sub-Admin' ? 'rgba(168, 85, 247, 0.15); color: #a855f7' :
+          'rgba(74, 222, 128, 0.15); color: #4ade80'};">
+                  ${u.role}
+                </span>
+              </td>
+              <td>
+                <span class="status-badge ${u.active ? 'active' : 'inactive'}">
+                  <span class="status-dot"></span>
+                  ${u.active ? 'Activo' : 'Inactivo'}
+                </span>
+              </td>
+              <td>
+                <div style="display: flex; gap: var(--space-2);">
+                  <button class="btn btn-sm btn-ghost btn-edit-usuario" data-id="${u.id}" title="Editar">✏️</button>
+                  <button class="btn btn-sm btn-ghost btn-delete-usuario" data-id="${u.id}" title="${u.active ? 'Desactivar' : 'Activar'}" style="color: ${u.active ? 'var(--color-error)' : 'var(--color-success)'};">
+                    ${u.active ? '🗑️' : '✅'}
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal Formulario Usuario -->
+    <div id="user-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+      <div style="background: var(--bg-secondary); border-radius: 16px; padding: var(--space-8); max-width: 480px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid var(--border-subtle);">
+        <h3 id="user-modal-title" style="font-family: 'Outfit'; margin-bottom: var(--space-6); color: var(--text-primary);">Nuevo Usuario</h3>
+        <form id="form-usuario" autocomplete="off">
+          <input type="hidden" id="user-edit-id" value="">
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" for="user-name">Nombre Completo</label>
+            <input type="text" id="user-name" class="form-input" style="padding-left: var(--space-4);" placeholder="Ej: Juan Pérez" required />
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" for="user-email">Email</label>
+            <input type="email" id="user-email" class="form-input" style="padding-left: var(--space-4);" placeholder="usuario@naturalfood.com" required />
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" for="user-password">Contraseña</label>
+            <input type="text" id="user-password" class="form-input" style="padding-left: var(--space-4);" placeholder="••••••••" />
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-6);">
+            <label class="form-label" for="user-role">Rol</label>
+            <select id="user-role" class="form-select" style="padding-left: var(--space-4);" required>
+              ${roles.map(r => `<option value="${r}">${r}</option>`).join('')}
+            </select>
+          </div>
+          <div style="display: flex; gap: var(--space-3); justify-content: flex-end;">
+            <button type="button" class="btn btn-ghost" id="btn-cancel-usuario">Cancelar</button>
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}

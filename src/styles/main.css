@@ -2238,26 +2238,28 @@ img {
 
 .desvio-badge.over {
   background: rgba(239, 68, 68, 0.12);
-  color: var(--color-error);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .desvio-badge.under {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.desvio-badge.on-target {
   background: rgba(16, 185, 129, 0.12);
   color: var(--color-primary-400);
 }
 
-.desvio-badge.on-target {
-  background: rgba(148, 163, 184, 0.12);
-  color: var(--text-tertiary);
-}
-
 /* Deviation value in metric cards */
 .desvio-value.over {
-  color: var(--color-error);
+  color: #ef4444;
 }
 
 .desvio-value.under {
-  color: var(--color-primary-400);
+  color: #f59e0b;
 }
 
 /* Charts Row */
