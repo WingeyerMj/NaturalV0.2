@@ -1,0 +1,23 @@
+Marcelo Wingeyer	subadmin@naturalfood.com	Administrador	N4tur4lf00d$00	
+
+José Miguel		admin@naturalfood.com	        Sub-Admin	N4tur4lf00d$01	
+
+Alejandro		ingeniero@naturalfood.com	Ingeniero	N4tur4lf00d$02	
+
+Santiago		rrhh@naturalfood.com		RRHH		N4tur4lf00d$03
+
+Tomas			carga@naturalfood.com		Carga		N4tur4lf00d$04	
+
+Juan Pablo		ana@naturalfood.com		Carga		N4tur4lf00d$04
+
+
+
+Fincas Viejas:
+http://apisofia.sofiagestionagricola.cl/trabajvsfaenas?nombre_usuario=NATURALFOOD&key_usuario=12345NC5xQdXAxT6jj8WrPH26krbn2y7sf6tt8mf&fecha_inicial=2024-12-01&fecha_final=2025-04-30
+
+El Espejo:
+*http://apisofia.sofiagestionagricola.cl/trabajvsfaenas?nombre_usuario=NATURALFOOD&key_usuario=123450S8fgNhWDfKUNxnzFr7xb6DK1us2OqJK2&fecha_inicial=2024-12-01&fecha_final=2025-05-31
+
+
+Pendiente
+la informacion de las fincas quiero que la tome de las api, de los informes de fincas, pero quiero que sean 4, El Espejo, Camino Truncado, La Chimbera y Puente Alto y El Espejo difivido en 3 predios y colocar los cuarteles, hectareas y plantas en la base de datos

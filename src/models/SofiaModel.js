@@ -324,7 +324,7 @@ export class SofiaImportModel {
             });
     }
 
-    static getWeeklyEvolution(filters = {}, fincaName = '', productoFilter = '') {
+    static getWeeklyEvolution(filters = {}, fincaName = '', productoFilter = '', predioFilter = '') {
         // Only these 3 products
         const ALLOWED = ['NUTRI 1075 M', 'NUTRI 1683 M', 'NUTRI 1684 M'];
 
@@ -333,14 +333,15 @@ export class SofiaImportModel {
                 r.categoria === 'Fertilizacion' &&
                 ALLOWED.includes((r.producto || '').toUpperCase()) &&
                 (!fincaName || r.finca_original === fincaName) &&
-                (!productoFilter || (r.producto || '').toUpperCase() === productoFilter.toUpperCase())
+                (!productoFilter || (r.producto || '').toUpperCase() === productoFilter.toUpperCase()) &&
+                (!predioFilter || r.clasifica === predioFilter)
             ),
             filters
         );
 
-        // ── Fixed projection period: 09/09/2025 → 28/02/2026 ──
+        // ── Fixed projection period: 09/09/2025 → 08/03/2026 ──
         const projStart = new Date(2025, 8, 9);   // Sep 9, 2025
-        const projEnd = new Date(2026, 1, 28);  // Feb 28, 2026
+        const projEnd = new Date(2026, 2, 8);   // Mar 8, 2026
 
         // Helper: get Monday of the ISO week for a given date
         const getMonday = (d) => {
@@ -467,32 +468,48 @@ export class SofiaImportModel {
             if (!allowedProducts.includes(prod)) return;
             // Product filter (individual selection)
             if (filters.producto && prod !== filters.producto.toUpperCase()) return;
-            if (r.cantidad > 0 && (r.n_units > 0 || r.p_units > 0 || r.k_units > 0)) {
+
+            if (r.cantidad > 0) {
                 const key = getGroupKey(r);
                 const uniqueKey = `${r.clasifica}-${r.cod_cuartel}-${r.producto}-${r.variedad}-${r.ciclo}-${tipo}`;
 
-                const cycleMatch = !filters.ciclo || r.ciclo === filters.ciclo || r.ciclo === 'Unknown';
-                const fincaMatch = !filters.finca || r.finca_original === filters.finca;
-                const predioMatch = !filters.predio || r.clasifica === filters.predio;
+                // Get nutrient units: use explicit columns if available, otherwise derive from composition
+                let nUnits = r.n_units || 0;
+                let pUnits = r.p_units || 0;
+                let kUnits = r.k_units || 0;
 
-                // Store per-group+product ratio for real calculations
-                const ratioKey = `${key}|${prod}`;
-                if (!nutrientDensities[ratioKey]) {
-                    nutrientDensities[ratioKey] = { n: 0, p: 0, k: 0, totalQty: 0 };
+                // If no explicit units, calculate from known compositions
+                if (nUnits === 0 && pUnits === 0 && kUnits === 0 && compositions[prod]) {
+                    const comp = compositions[prod];
+                    nUnits = r.cantidad * comp.n;
+                    pUnits = r.cantidad * comp.p;
+                    kUnits = r.cantidad * comp.k;
                 }
-                nutrientDensities[ratioKey].n += r.n_units;
-                nutrientDensities[ratioKey].p += r.p_units;
-                nutrientDensities[ratioKey].k += r.k_units;
-                nutrientDensities[ratioKey].totalQty += r.cantidad;
 
-                if (cycleMatch && fincaMatch && predioMatch) {
-                    if (!processedBudgets.has(uniqueKey)) {
-                        processedBudgets.add(uniqueKey);
-                        if (!budgetStats[key]) budgetStats[key] = { n: 0, p: 0, k: 0 };
+                if (nUnits > 0 || pUnits > 0 || kUnits > 0) {
+                    const cycleMatch = !filters.ciclo || r.ciclo === filters.ciclo || r.ciclo === 'Unknown';
+                    const fincaMatch = !filters.finca || r.finca_original === filters.finca;
+                    const predioMatch = !filters.predio || r.clasifica === filters.predio;
 
-                        budgetStats[key].n += r.n_units;
-                        budgetStats[key].p += r.p_units;
-                        budgetStats[key].k += r.k_units;
+                    // Store per-group+product ratio for real calculations
+                    const ratioKey = `${key}|${prod}`;
+                    if (!nutrientDensities[ratioKey]) {
+                        nutrientDensities[ratioKey] = { n: 0, p: 0, k: 0, totalQty: 0 };
+                    }
+                    nutrientDensities[ratioKey].n += nUnits;
+                    nutrientDensities[ratioKey].p += pUnits;
+                    nutrientDensities[ratioKey].k += kUnits;
+                    nutrientDensities[ratioKey].totalQty += r.cantidad;
+
+                    if (cycleMatch && fincaMatch && predioMatch) {
+                        if (!processedBudgets.has(uniqueKey)) {
+                            processedBudgets.add(uniqueKey);
+                            if (!budgetStats[key]) budgetStats[key] = { n: 0, p: 0, k: 0 };
+
+                            budgetStats[key].n += nUnits;
+                            budgetStats[key].p += pUnits;
+                            budgetStats[key].k += kUnits;
+                        }
                     }
                 }
             }
