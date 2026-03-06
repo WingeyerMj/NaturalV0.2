@@ -3,15 +3,20 @@
  * NATURALFOOD - Controller Layer
  * Handles all business logic, routing, and user interactions
  * ═══════════════════════════════════════════════════════════
+ * VERSION: 1.0.2 - MENU UPDATE (GASTOS & SECADEROS)
+ * ═══════════════════════════════════════════════════════════
  */
 
 import { Chart, registerables } from 'chart.js';
-Chart.register(...registerables);
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+Chart.register(...registerables, ChartDataLabels);
+// Desactivar datalabels globalmente, solo se activa explícitamente por gráfico
+Chart.defaults.set('plugins.datalabels', { display: false });
 
 import {
     UserModel, FincaModel, PredioModel, VariedadModel,
     EmpleadoModel, LaborModel, PresupuestoModel, AplicacionModel,
-    NotificationModel
+    NotificationModel, ADMIN_MODELS, ADMIN_TABLE_CONFIG
 } from '../models/DataModels.js';
 
 import { SofiaImportModel } from '../models/SofiaModel.js';
@@ -28,18 +33,57 @@ import {
     renderInformeAplicaciones, renderSofiaResumen, renderSofiaFoliares,
     renderSofiaHerbicidas, renderFertilizacionComparativa, formatCurrency,
     renderHectareasPorPredio, renderEficienciaChartSection,
-    renderCosechaLevantadoTable
+    renderCosechaLevantadoTable, renderAdminCrudView, renderWorkLogView,
+    renderGastosView, renderSecaderosView
 } from '../views/Views.js';
 
 // ── Constants ──
+const VITE_API_URL = 'http://localhost:10000/api';
 const ROLE_MENUS = {
     'Administrador': [
+        {
+            id: 'operativa', label: 'Operativa', icon: '🚜', section: 'Principal', submenu: [
+                { id: 'admin-carga-trabajo', label: 'Carga de Trabajo', icon: '📝' },
+            ]
+        },
         {
             id: 'informes', label: 'Informes', icon: '📈', section: 'Principal', submenu: [
                 { id: 'jornales', label: 'Jornales', icon: '👷' },
                 { id: 'cosecha', label: 'Cosecha', icon: '🍇' },
                 { id: 'fincas', label: 'Fincas', icon: '🏡' },
                 { id: 'aplicaciones-sofia', label: 'Aplicaciones', icon: '🧪' },
+                { id: 'informe-gastos', label: 'Gastos', icon: '💰' },
+                { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
+            ]
+        },
+        {
+            id: 'admin-fincas-menu', label: 'Fincas', icon: '🌲', section: 'Sistema', submenu: [
+                { id: 'admin-fincas', label: 'Gestión Fincas', icon: '🏡' },
+                { id: 'admin-predios', label: 'Predios', icon: '📍' },
+                { id: 'admin-cuarteles', label: 'Cuarteles/Parcelas', icon: '🗺️' },
+                { id: 'admin-bodegas', label: 'Bodegas', icon: '🏭' },
+            ]
+        },
+        {
+            id: 'administracion', label: 'Panel de Control', icon: '⚙️', section: 'Sistema', submenu: [
+                { id: 'usuarios', label: 'Usuarios', icon: '👥' },
+                { id: 'admin-faenas', label: 'Faenas', icon: '📋' },
+                { id: 'admin-labor', label: 'Labor', icon: '🔨' },
+                { id: 'admin-productos', label: 'Productos', icon: '📦' },
+                { id: 'admin-institucional', label: 'Institucional', icon: '🏛️' },
+                { id: 'admin-planificacion', label: 'Planificación', icon: '📅' },
+            ]
+        },
+        {
+            id: 'personal', label: 'Personal', icon: '👷', section: 'Sistema', submenu: [
+                { id: 'admin-personal', label: 'Gestión Personal', icon: '👥' },
+                { id: 'admin-contratos', label: 'Contratos', icon: '📄' },
+            ]
+        },
+        {
+            id: 'riego', label: 'Riego', icon: '💧', section: 'Sistema', submenu: [
+                { id: 'admin-zonas-riego', label: 'Zonas de Riego', icon: '🗺️' },
+                { id: 'admin-sistema-riego', label: 'Sistema de Riego', icon: '🚿' },
             ]
         },
     ],
@@ -50,6 +94,8 @@ const ROLE_MENUS = {
                 { id: 'cosecha', label: 'Cosecha', icon: '🍇' },
                 { id: 'fincas', label: 'Fincas', icon: '🏡' },
                 { id: 'aplicaciones-sofia', label: 'Aplicaciones', icon: '🧪' },
+                { id: 'informe-gastos', label: 'Gastos', icon: '💰' },
+                { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
             ]
         },
     ],
@@ -60,6 +106,8 @@ const ROLE_MENUS = {
                 { id: 'cosecha', label: 'Cosecha', icon: '🍇' },
                 { id: 'fincas', label: 'Fincas', icon: '🏡' },
                 { id: 'aplicaciones-sofia', label: 'Aplicaciones', icon: '🧪' },
+                { id: 'informe-gastos', label: 'Gastos', icon: '💰' },
+                { id: 'informe-secaderos', label: 'Secaderos', icon: '☀️' },
             ]
         },
     ],
@@ -111,7 +159,7 @@ export class AppController {
         this.app.innerHTML = renderDashboardLayout(user, menuItems, section);
         this.bindDashboardEvents(user);
 
-        // -- PROGRESSIVE LOADING OF HISTORY --
+        // -- FAST LOADING (CURRENT CYCLE ONLY) AND BACKGROUND HISTORY --
         const overlay = document.getElementById('loading-overlay');
         const progressBar = document.getElementById('loading-progress');
         const progressMessage = document.getElementById('loading-message');
@@ -119,8 +167,6 @@ export class AppController {
 
         if (overlay) {
             overlay.classList.remove('hidden');
-
-            const cycles = ['2021-2022', '2022-2023', '2023-2024', '2024-2025', '2025-2026'];
 
             try {
                 // Health Check: Verificar si el proxy/servidor de Sofía está vivo
@@ -148,25 +194,45 @@ export class AppController {
                     throw new Error("El Servidor de Sofia está caído o no resuelve.");
                 }
 
-                for (let i = 0; i < cycles.length; i++) {
-                    const cycle = cycles[i];
-                    const percent = Math.round(((i) / cycles.length) * 100);
+                const currentCycle = SofiaApiModel.getCurrentCycle();
 
-                    if (progressMessage) progressMessage.textContent = `Descargando ciclo ${cycle}...`;
-                    if (progressBar) progressBar.style.width = `${percent}%`;
-                    if (progressDetails) progressDetails.textContent = `${i}/${cycles.length} ciclos completados`;
+                if (progressMessage) progressMessage.textContent = `Sincronizando ciclo actual (${currentCycle})...`;
+                if (progressBar) progressBar.style.width = `50%`;
 
-                    // Force UI update
-                    await new Promise(r => setTimeout(r, 50));
+                // -- NEW: Sync Business Data from MySQL --
+                if (progressDetails) progressDetails.textContent = 'Sincronizando datos de negocio...';
+                await Promise.all([
+                    UserModel.sync(),
+                    FincaModel.sync(),
+                    PredioModel.sync(),
+                    VariedadModel.sync(),
+                    EmpleadoModel.sync(),
+                    LaborModel.sync(),
+                    PresupuestoModel.sync(),
+                    AplicacionModel.sync()
+                ]);
 
-                    // Fetch Data Sequentially
-                    await SofiaApiModel.fetchCycleData(cycle);
-                }
+                await new Promise(r => setTimeout(r, 1000)); // Reduced wait for Sofia and local sync
+                if (progressBar) progressBar.style.width = `80%`;
+                if (progressDetails) progressDetails.textContent = `Optimizando base de datos`;
+
+                // Solo detenemos la UI para cargar el ciclo actual
+                await SofiaApiModel.fetchCycleData(currentCycle);
+
+                // Iniciamos la descarga/carga de la BD local del resto de los ciclos en segundo plano
+                setTimeout(async () => {
+                    const cycles = ['2021-2022', '2022-2023', '2023-2024', '2024-2025', '2025-2026'];
+                    for (const c of cycles) {
+                        if (c !== currentCycle) {
+                            await SofiaApiModel.fetchCycleData(c);
+                        }
+                    }
+                }, 500);
 
                 // Complete
                 if (progressBar) progressBar.style.width = '100%';
                 if (progressMessage) progressMessage.textContent = 'Procesando datos...';
-                await new Promise(r => setTimeout(r, 500)); // Short delay for visual completion
+                await new Promise(r => setTimeout(r, 300)); // Short delay for visual completion
 
             } catch (error) {
                 console.error("Error loading historical data:", error);
@@ -204,6 +270,30 @@ export class AppController {
                 title.textContent = 'Informe de Aplicaciones';
                 await this.loadStaticSofiaData();
                 this.renderAplicacionesSofiaModule(content);
+                break;
+            case 'informe-gastos':
+                title.textContent = 'Informe de Gastos';
+                this.renderInformesContent(content, 'gastos');
+                break;
+            case 'informe-secaderos':
+                title.textContent = 'Informe de Secaderos';
+                this.renderInformesContent(content, 'secaderos');
+                break;
+            case 'usuarios':
+                title.textContent = 'Gestión de Usuarios';
+                this.renderUsuariosSection(content);
+                break;
+            case 'admin-carga-trabajo':
+                title.textContent = 'Carga de Trabajo de Campo';
+                this.renderCargaTrabajoSection(content);
+                break;
+            default:
+                // Handle all admin-* sections dynamically
+                if (section && section.startsWith('admin-') && ADMIN_TABLE_CONFIG[section]) {
+                    const cfg = ADMIN_TABLE_CONFIG[section];
+                    title.textContent = cfg.title;
+                    this.renderAdminCrudSection(content, section);
+                }
                 break;
         }
 
@@ -282,7 +372,7 @@ export class AppController {
 
             // Render jornales stats + eficiencia chart (Hectáreas por predio moved to Fincas section)
             const hectareasData = SofiaApiModel.getHectareasPorPredio(data);
-            content.innerHTML = renderSofiaJornalesStats(stats, efficiency, filters.ciclo)
+            content.innerHTML = renderSofiaJornalesStats(stats, efficiency, filters.ciclo, this.currentUser?.role)
                 + renderEficienciaChartSection(hectareasData);
 
             // Bind Table Cycle Selector to Sync
@@ -470,6 +560,14 @@ export class AppController {
               <option value="2022-2023">2022-2023</option>
               <option value="2021-2022">2021-2022</option>
               <option value="2020-2021">2020-2021</option>
+              <option value="2019-2020">2019-2020</option>
+              <option value="2018-2019">2018-2019</option>
+              <option value="2017-2018">2017-2018</option>
+              <option value="2016-2017">2016-2017</option>
+              <option value="2015-2016">2015-2016</option>
+              <option value="2014-2015">2014-2015</option>
+              <option value="2013-2014">2013-2014</option>
+              <option value="2012-2013">2012-2013</option>
             </select>
           </div>
           <div class="filter-group">
@@ -492,6 +590,9 @@ export class AppController {
               <option value="">Todas</option>
             </select>
           </div>
+          ${this.currentUser?.role === 'Administrador' ? `<div class="filter-group" style="display: flex; align-items: flex-end;">
+            <button id="btn-cerrar-ciclo" class="btn btn-primary" style="height: 42px; background-color: var(--color-error); border-color: var(--color-error);">Archivar Ciclo</button>
+          </div>` : ''}
         </div>
 
         <div id="cosecha-dashboard-container">
@@ -541,16 +642,19 @@ export class AppController {
             const filtered = SofiaApiModel.applyFilters(data, filters);
             const stats = SofiaApiModel.getCosechaDashboardStats(filtered);
 
+            // Add expectativa from local storage
+            stats.expectativaKg = localStorage.getItem(`expectativa_${filters.ciclo}`) || '';
+
             const clWrapper = document.getElementById('cosecha-levantado-wrapper');
             if (!clWrapper) {
                 // First pass, add wrapper
-                dashboard.innerHTML = renderCosechaDashboard(stats) + '<div id="cosecha-levantado-wrapper"></div>';
+                dashboard.innerHTML = renderCosechaDashboard(stats, this.currentUser?.role) + '<div id="cosecha-levantado-wrapper"></div>';
                 updateCosechaLevantadoWidget();
             } else {
                 // Sub-components are already there, just replace the top dashboard
                 // We must use a temporary container to swap the HTML while preserving the wrapper
                 const tmp = document.createElement('div');
-                tmp.innerHTML = renderCosechaDashboard(stats);
+                tmp.innerHTML = renderCosechaDashboard(stats, this.currentUser?.role);
 
                 // Clear all nodes in dashboard except the wrappers we want to preserve
                 Array.from(dashboard.childNodes).forEach(node => {
@@ -565,7 +669,13 @@ export class AppController {
                 }
             }
 
-
+            // Bind Expectativa Listener
+            const inputExpectativa = document.getElementById('input-expectativa');
+            if (inputExpectativa) {
+                inputExpectativa.addEventListener('change', (e) => {
+                    localStorage.setItem(`expectativa_${filters.ciclo}`, e.target.value);
+                });
+            }
 
             // Update dynamic filter options
             updateFilterList('filter-cosecha-predio', 'predio', data);
@@ -625,6 +735,30 @@ export class AppController {
         bind('filter-cosecha-finca', 'finca');
         bind('filter-cosecha-predio', 'predio');
         bind('filter-cosecha-variedad', 'variedad');
+
+        const btnCerrarCiclo = document.getElementById('btn-cerrar-ciclo');
+        if (btnCerrarCiclo) {
+            btnCerrarCiclo.addEventListener('click', async () => {
+                const currentCycle = document.getElementById('filter-cosecha-ciclo').value;
+                if (confirm(`¿Estás seguro que deseas pasar el ciclo ${currentCycle} a histórico (Archivarlo)?\nSe guardará localmente para mejorar el rendimiento y dejará de actualizarse desde Sofía.`)) {
+                    // Force refresh from API one last time before converting it to manual historical
+                    const btnOriginalText = btnCerrarCiclo.textContent;
+                    btnCerrarCiclo.textContent = 'Archivando...';
+                    btnCerrarCiclo.disabled = true;
+                    try {
+                        await SofiaApiModel.fetchCycleData(currentCycle, true);
+                        localStorage.setItem(`manualHistory_${currentCycle}`, 'true');
+                        alert(`Ciclo ${currentCycle} guardado en histórico exitosamente.`);
+                        updateDashboard();
+                    } catch (e) {
+                        alert("Error archivando el ciclo.");
+                    } finally {
+                        btnCerrarCiclo.textContent = btnOriginalText;
+                        btnCerrarCiclo.disabled = false;
+                    }
+                }
+            });
+        }
 
         // State for inner widget
         const clFiltersState = { finca: '', ciclo: filters.ciclo };
@@ -687,7 +821,7 @@ export class AppController {
 
         // @ts-ignore
         this.charts.cosechaEvolucionRendimiento = new Chart(ctx, {
-            type: 'line',
+            type: 'bar', // Changed from line to bar
             data: stats,
             options: {
                 ...this.getChartOptions('Kg'),
@@ -731,15 +865,78 @@ export class AppController {
             this.charts.cosechaHistory.destroy();
         }
 
+        // Dataset de datos reales (índice 1 en stats.datasets)
+        const realDataset = stats.datasets[1]; // Producción Real
+        const estimadoDataset = stats.datasets[0]; // Estimado BP
+
+        // Línea de tendencia usa los datos reales
+        const realData = realDataset?.data || [];
+        const lineDataset = {
+            label: 'Tendencia',
+            data: [...realData],
+            type: 'line',
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245, 158, 11, 0.15)',
+            pointBackgroundColor: '#f59e0b',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            borderWidth: 2.5,
+            tension: 0.3,
+            fill: false,
+            order: 0,
+            datalabels: { display: false }
+        };
+
+        const chartData = {
+            labels: stats.labels,
+            datasets: [
+                {
+                    ...estimadoDataset,
+                    order: 2,
+                    barPercentage: 0.85,
+                    grouped: false,
+                    datalabels: {
+                        display: true,
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        anchor: 'end',
+                        align: 'end',
+                        font: { size: 10, weight: '600' },
+                        formatter: (value) => {
+                            if (!value) return '';
+                            let fmt = value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' : Math.round(value / 1000) + 'K';
+                            return fmt + ' (Est.)';
+                        }
+                    }
+                },
+                { ...realDataset, order: 1, barPercentage: 0.85, grouped: false },
+                lineDataset
+            ]
+        };
+
         // @ts-ignore
         this.charts.cosechaHistory = new Chart(ctx, {
             type: 'bar',
-            data: stats,
+            data: chartData,
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false },
+                    legend: {
+                        display: false
+                    },
+                    datalabels: {
+                        display: true,
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#e2e8f0',
+                        font: { size: 10, weight: 'bold' },
+                        formatter: (value) => {
+                            if (!value || value === 0) return '';
+                            if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+                            if (value >= 1000) return Math.round(value / 1000) + 'K';
+                            return value;
+                        }
+                    },
                     tooltip: {
                         callbacks: {
                             label: function (context) {
@@ -760,6 +957,514 @@ export class AppController {
                     }
                 }
             }
+        });
+    }
+
+    // ── Sección: USUARIOS (Admin only) ──
+    async renderUsuariosSection(container) {
+        const users = await UserModel.getAll();
+        const roles = Object.values(UserModel.ROLES);
+        container.innerHTML = renderUsuariosView(users, roles);
+
+        const showModal = (editing = null) => {
+            const overlay = document.getElementById('user-modal-overlay');
+            const title = document.getElementById('user-modal-title');
+            overlay.style.display = 'flex';
+
+            if (editing) {
+                title.textContent = '✏️ Editar Usuario';
+                document.getElementById('user-edit-id').value = editing.id;
+                document.getElementById('user-name').value = editing.name;
+                document.getElementById('user-email').value = editing.email;
+                document.getElementById('user-password').value = '';
+                document.getElementById('user-password').placeholder = '(dejar vacío para no cambiar)';
+                document.getElementById('user-role').value = editing.role;
+            } else {
+                title.textContent = '➕ Nuevo Usuario';
+                document.getElementById('user-edit-id').value = '';
+                document.getElementById('form-usuario').reset();
+                document.getElementById('user-password').placeholder = 'Contraseña';
+            }
+        };
+
+        const hideModal = () => {
+            document.getElementById('user-modal-overlay').style.display = 'none';
+        };
+
+        const refreshTable = () => {
+            this.renderUsuariosSection(container);
+        };
+
+        // Nuevo usuario
+        document.getElementById('btn-add-usuario')?.addEventListener('click', () => showModal());
+
+        // Cancelar
+        document.getElementById('btn-cancel-usuario')?.addEventListener('click', hideModal);
+
+        // Click fuera del modal
+        document.getElementById('user-modal-overlay')?.addEventListener('click', (e) => {
+            if (e.target.id === 'user-modal-overlay') hideModal();
+        });
+
+        // Submit form (Create or Update)
+        document.getElementById('form-usuario')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnSave = e.target.querySelector('button[type="submit"]');
+            const originalText = btnSave.textContent;
+
+            const editId = document.getElementById('user-edit-id').value;
+            const userData = {
+                name: document.getElementById('user-name').value.trim(),
+                email: document.getElementById('user-email').value.trim(),
+                role: document.getElementById('user-role').value,
+                active: true // Default to active on edit/create
+            };
+            const password = document.getElementById('user-password').value.trim();
+            if (password) userData.password = password;
+
+            btnSave.disabled = true;
+            btnSave.textContent = '...';
+
+            if (editId) {
+                // If editing, preserve active status if it was inactive (optional enhancement could be added)
+                const existing = users.find(u => u.id === parseInt(editId));
+                if (existing) userData.active = existing.active;
+                await UserModel.update(parseInt(editId), userData);
+            } else {
+                if (!password) {
+                    alert('La contraseña es obligatoria para usuarios nuevos.');
+                    btnSave.disabled = false;
+                    btnSave.textContent = originalText;
+                    return;
+                }
+                UserModel.add(userData); // Using add for simplicity or could be move to backend too
+            }
+
+            hideModal();
+            refreshTable();
+        });
+
+        // Editar
+        container.querySelectorAll('.btn-edit-usuario').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = parseInt(btn.dataset.id);
+                const user = users.find(u => u.id === id);
+                if (user) showModal(user);
+            });
+        });
+
+        // Deactivate / Reactivate (Delete button)
+        container.querySelectorAll('.btn-delete-usuario').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = parseInt(btn.dataset.id);
+                const user = users.find(u => u.id === id);
+                if (!user) return;
+
+                const action = user.active ? 'desactivar' : 'reactivar';
+                if (confirm(`¿Está seguro que desea ${action} al usuario "${user.name}"?`)) {
+                    btn.disabled = true;
+                    await UserModel.update(id, { ...user, active: !user.active });
+                    refreshTable();
+                }
+            });
+        });
+
+        // Aprobar usuario pendiente
+        container.querySelectorAll('.btn-approve-usuario').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = parseInt(btn.dataset.id);
+                // Search in local users array fetched at start of section
+                const user = users.find(u => u.id === id);
+                if (!user) return;
+
+                if (confirm(`¿Aprobar el acceso de "${user.name}" (${user.email})?`)) {
+                    btn.disabled = true;
+                    btn.textContent = '...';
+                    const success = await UserModel.approveUser(id);
+                    if (success) {
+                        refreshTable();
+                        // Update notification badge if exists
+                        const badge = document.getElementById('notification-badge');
+                        if (badge) badge.textContent = NotificationModel.getUnread().length || '';
+                    } else {
+                        btn.disabled = false;
+                        btn.textContent = '✅ Aprobar';
+                        alert('Error al aprobar usuario.');
+                    }
+                }
+            });
+        });
+
+        // Rechazar usuario pendiente
+        container.querySelectorAll('.btn-reject-usuario').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = parseInt(btn.dataset.id);
+                const user = users.find(u => u.id === id);
+                if (!user) return;
+
+                if (confirm(`¿Rechazar la solicitud de "${user.name}"?\nEl usuario será eliminado.`)) {
+                    btn.disabled = true;
+                    btn.textContent = '...';
+                    const success = await UserModel.rejectUser(id);
+                    if (success) {
+                        refreshTable();
+                        // Update notification badge
+                        const badge = document.getElementById('notification-badge');
+                        if (badge) badge.textContent = NotificationModel.getUnread().length || '';
+                    } else {
+                        btn.disabled = false;
+                        btn.textContent = '❌ Rechazar';
+                        alert('Error al rechazar usuario.');
+                    }
+                }
+            });
+        });
+
+        // Buscador
+        document.getElementById('search-usuarios')?.addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase();
+            document.querySelectorAll('#table-usuarios tbody tr').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(q) ? '' : 'none';
+            });
+        });
+    }
+
+    // ── Sección: CRUD Genérico Admin ──
+    async renderAdminCrudSection(container, sectionId) {
+        const config = ADMIN_TABLE_CONFIG[sectionId];
+        const model = ADMIN_MODELS[sectionId];
+        if (!config || !model) return;
+
+        // Show loading spinner
+        container.innerHTML = `
+            <div style="padding: var(--space-20); text-align: center; color: var(--text-tertiary);">
+                <div class="spinner" style="margin: 0 auto var(--space-4);"></div>
+                <p>Cargando ${config.title.toLowerCase()}...</p>
+            </div>
+        `;
+
+        const data = await model.getAll();
+        container.innerHTML = renderAdminCrudView(config, data);
+
+        // ── Event bindings ──
+        const refreshTable = async () => {
+            const freshData = await model.getAll();
+            container.innerHTML = renderAdminCrudView(config, freshData);
+            this.bindAdminCrudEvents(container, config, model, refreshTable);
+        };
+
+        this.bindAdminCrudEvents(container, config, model, refreshTable);
+    }
+
+    async renderCargaTrabajoSection(container) {
+        container.innerHTML = `<div style="padding: 2rem; text-align: center;">⌛ Cargando sistema de operativa...</div>`;
+
+        try {
+            // Fetch everything needed with individual error catching for debug
+            const [logs, fincas, predios, cuarteles, faenas, labores, personal, productos] = await Promise.all([
+                fetch(`${VITE_API_URL}/trabajo-campo-completo`).then(r => r.json()).catch(e => { console.error('Error logs:', e); throw e; }),
+                ADMIN_MODELS['admin-fincas'].getAll().catch(e => { console.error('Error fincas:', e); throw e; }),
+                ADMIN_MODELS['admin-predios'].getAll().catch(e => { console.error('Error predios:', e); throw e; }),
+                ADMIN_MODELS['admin-cuarteles'].getAll().catch(e => { console.error('Error cuarteles:', e); throw e; }),
+                ADMIN_MODELS['admin-faenas'].getAll().catch(e => { console.error('Error faenas:', e); throw e; }),
+                ADMIN_MODELS['admin-labor'].getAll().catch(e => { console.error('Error labor:', e); throw e; }),
+                UserModel.getAll().catch(e => { console.error('Error personal:', e); throw e; }), // Personal/Empleados
+                ADMIN_MODELS['admin-productos'].getAll().catch(e => { console.error('Error productos:', e); throw e; })
+            ]);
+
+            const catalogs = { fincas, predios, cuarteles, faenas, labores, empleados: personal, productos };
+
+            container.innerHTML = renderWorkLogView(logs, catalogs);
+            this.bindWorkLogEvents(container, logs, catalogs);
+        } catch (e) {
+            console.error('Work section load error:', e);
+            container.innerHTML = `<div style="padding: 2rem; color: var(--color-error);">
+                Error al cargar catálogos operativos. Verifique la base de datos.<br>
+                <code style="color: black; background: #fee; padding: 1rem; display: block; margin-top: 1rem; text-align: left;">${e.stack || e.message || String(e)}</code>
+            </div>`;
+        }
+    }
+
+    bindWorkLogEvents(container, currentLogs, catalogs) {
+        const { fincas, predios, cuarteles, productos } = catalogs;
+
+        const refresh = () => this.renderCargaTrabajoSection(container);
+
+        // -- Modal UI --
+        const modal = document.getElementById('work-log-modal-overlay');
+        document.getElementById('btn-add-work-log')?.addEventListener('click', () => modal.style.display = 'flex');
+        document.getElementById('btn-close-work-modal')?.addEventListener('click', () => modal.style.display = 'none');
+        document.getElementById('btn-cancel-work-log')?.addEventListener('click', () => modal.style.display = 'none');
+
+        // -- Chained Dropdowns --
+        const fincaSelect = document.getElementById('work-finca');
+        const predioSelect = document.getElementById('work-predio');
+        const cuartelSelect = document.getElementById('work-cuartel');
+
+        fincaSelect?.addEventListener('change', (e) => {
+            const fid = e.target.value;
+            predioSelect.innerHTML = '<option value="">Seleccionar Predio...</option>';
+            cuartelSelect.innerHTML = '<option value="">-</option>';
+            cuartelSelect.disabled = true;
+
+            if (fid) {
+                const subPredios = predios.filter(p => p.finca_id == fid);
+                subPredios.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id; opt.textContent = p.nombre;
+                    predioSelect.appendChild(opt);
+                });
+                predioSelect.disabled = false;
+            } else {
+                predioSelect.disabled = true;
+            }
+        });
+
+        predioSelect?.addEventListener('change', (e) => {
+            const pid = e.target.value;
+            cuartelSelect.innerHTML = '<option value="">Seleccionar Cuartel...</option>';
+            if (pid) {
+                const subCuarteles = cuarteles.filter(c => c.predio_id == pid);
+                subCuarteles.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id; opt.textContent = `Cuartel ${c.numero}`;
+                    cuartelSelect.appendChild(opt);
+                });
+                cuartelSelect.disabled = false;
+            } else {
+                cuartelSelect.disabled = true;
+            }
+        });
+
+        // -- Faena -> Labor Chained Dropdown --
+        const faenaSelect = document.getElementById('work-faena');
+        const laborSelect = document.getElementById('work-labor');
+
+        faenaSelect?.addEventListener('change', (e) => {
+            const faenaId = e.target.value;
+            laborSelect.innerHTML = '<option value="">Seleccionar Labor Específica...</option>';
+            laborSelect.disabled = true;
+
+            if (faenaId) {
+                const { labores } = catalogs;
+                const subLabores = labores.filter(l => l.faena_id == faenaId);
+                subLabores.forEach(l => {
+                    const opt = document.createElement('option');
+                    opt.value = l.id; opt.textContent = l.nombre;
+                    laborSelect.appendChild(opt);
+                });
+                laborSelect.disabled = false;
+            } else {
+                laborSelect.disabled = true;
+            }
+        });
+
+        // -- Insumos Dynamic Rows --
+        const addInsumoBtn = document.getElementById('btn-add-insumo-row');
+        const insumoContainer = document.getElementById('insumos-list-container');
+        const template = document.getElementById('template-insumo-item');
+
+        addInsumoBtn?.addEventListener('click', () => {
+            const clone = template.content.cloneNode(true);
+            const row = clone.querySelector('.insumo-row');
+            row.querySelector('.btn-remove-insumo').onclick = () => row.remove();
+            insumoContainer.appendChild(clone);
+        });
+
+        // -- Search --
+        document.getElementById('search-work-logs')?.addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase();
+            document.querySelectorAll('#table-work-logs tbody tr').forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+
+        // -- Delete --
+        container.querySelectorAll('.btn-delete-work-log').forEach(btn => {
+            btn.onclick = async () => {
+                if (confirm('¿Eliminar este registro de trabajo? Esto no restaurará el stock de insumos automáticamente.')) {
+                    const id = btn.dataset.id;
+                    const res = await ADMIN_MODELS['admin-carga-trabajo'].delete(id);
+                    if (res.success) refresh();
+                }
+            };
+        });
+
+        // -- Form Submission --
+        document.getElementById('form-work-log')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnSubmit = e.target.querySelector('button[type="submit"]');
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = '...';
+
+            try {
+                // Gather Data
+                const logData = {
+                    fecha: document.getElementById('work-fecha').value,
+                    empleado_id: document.getElementById('work-empleado').value,
+                    finca_id: document.getElementById('work-finca').value,
+                    predio_id: document.getElementById('work-predio').value,
+                    cuartel_id: document.getElementById('work-cuartel').value,
+                    faena_id: document.getElementById('work-faena').value,
+                    labor_id: document.getElementById('work-labor').value || null,
+                    cantidad: document.getElementById('work-cantidad').value,
+                    unidad: document.getElementById('work-unidad').value,
+                    notas: document.getElementById('work-notas').value
+                };
+
+                const insumosUsed = [];
+                insumoContainer.querySelectorAll('.insumo-row').forEach(row => {
+                    const prodId = row.querySelector('.select-insumo-id').value;
+                    const qty = row.querySelector('.input-insumo-qty').value;
+                    if (prodId && qty) {
+                        insumosUsed.push({ producto_id: prodId, cantidad: qty });
+                    }
+                });
+
+                const toolsUsed = Array.from(document.querySelectorAll('input[name="work-tools"]:checked')).map(i => i.value);
+
+                const payload = { log: logData, insumos: insumosUsed, herramientas: toolsUsed };
+
+                const resp = await fetch(`${VITE_API_URL}/trabajo-campo`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await resp.json();
+
+                if (result.success) {
+                    modal.style.display = 'none';
+                    refresh();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error al registrar trabajo');
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.textContent = '💾 Registrar Trabajo';
+            }
+        });
+    }
+
+    bindAdminCrudEvents(container, config, model, refreshTable) {
+        const columns = config.columns;
+
+        const showModal = (editing = null) => {
+            const overlay = document.getElementById('admin-crud-modal-overlay');
+            const titleEl = document.getElementById('admin-crud-modal-title');
+            if (!overlay) return;
+            overlay.style.display = 'flex';
+
+            if (editing) {
+                titleEl.innerHTML = `${config.icon} ✏️ Editar Registro`;
+                document.getElementById('admin-crud-edit-id').value = editing.id;
+                columns.forEach(col => {
+                    const el = document.getElementById(`admin-crud-${col.key}`);
+                    if (!el) return;
+                    let val = editing[col.key] ?? '';
+                    if (col.type === 'date' && val) {
+                        try {
+                            val = new Date(val).toISOString().split('T')[0];
+                        } catch (e) { }
+                    }
+                    el.value = val;
+                });
+            } else {
+                titleEl.innerHTML = `${config.icon} ➕ Nuevo Registro`;
+                document.getElementById('admin-crud-edit-id').value = '';
+                document.getElementById('form-admin-crud')?.reset();
+            }
+        };
+
+        const hideModal = () => {
+            const overlay = document.getElementById('admin-crud-modal-overlay');
+            if (overlay) overlay.style.display = 'none';
+        };
+
+        // New record
+        document.getElementById('btn-add-admin-crud')?.addEventListener('click', () => showModal());
+
+        // Cancel
+        document.getElementById('btn-cancel-admin-crud')?.addEventListener('click', hideModal);
+
+        // Click outside modal
+        document.getElementById('admin-crud-modal-overlay')?.addEventListener('click', (e) => {
+            if (e.target.id === 'admin-crud-modal-overlay') hideModal();
+        });
+
+        // Submit (Create or Update)
+        document.getElementById('form-admin-crud')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnSave = e.target.querySelector('button[type="submit"]');
+            const originalText = btnSave.textContent;
+            btnSave.disabled = true;
+            btnSave.textContent = '...';
+
+            const editId = document.getElementById('admin-crud-edit-id').value;
+            const formData = {};
+            columns.forEach(col => {
+                const el = document.getElementById(`admin-crud-${col.key}`);
+                if (!el) return;
+                let val = el.value;
+                if (col.type === 'number' && val !== '') val = Number(val);
+                formData[col.key] = val;
+            });
+
+            let result;
+            if (editId) {
+                result = await model.update(parseInt(editId), formData);
+            } else {
+                result = await model.create(formData);
+            }
+
+            if (result.success) {
+                hideModal();
+                this.showToast(result.message || 'Operación exitosa', 'success');
+                await refreshTable();
+            } else {
+                alert(result.message || 'Error en la operación');
+                btnSave.disabled = false;
+                btnSave.textContent = originalText;
+            }
+        });
+
+        // Edit
+        container.querySelectorAll('.btn-edit-admin-crud').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = parseInt(btn.dataset.id);
+                const item = await model.getById(id);
+                if (item) showModal(item);
+            });
+        });
+
+        // Delete
+        container.querySelectorAll('.btn-delete-admin-crud').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = parseInt(btn.dataset.id);
+                if (confirm('¿Está seguro que desea eliminar este registro?')) {
+                    btn.disabled = true;
+                    const result = await model.delete(id);
+                    if (result.success) {
+                        this.showToast('Registro eliminado', 'success');
+                        await refreshTable();
+                    } else {
+                        btn.disabled = false;
+                        alert(result.message || 'Error al eliminar');
+                    }
+                }
+            });
+        });
+
+        // Search
+        document.getElementById('search-admin-crud')?.addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase();
+            document.querySelectorAll('#table-admin-crud tbody tr').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(q) ? '' : 'none';
+            });
         });
     }
 
@@ -1078,9 +1783,16 @@ export class AppController {
     }
 
     // ── Informes Content ──
-    renderInformesContent(container) {
+    renderInformesContent(container, initialTab = 'presupuesto') {
         container.innerHTML = renderInformesView();
-        this.renderInformeTab('presupuesto');
+
+        // Update active class in the new vertical nav
+        const tabs = document.querySelectorAll('#informes-tabs .tab-btn');
+        tabs.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === initialTab);
+        });
+
+        this.renderInformeTab(initialTab);
         this.bindInformeTabEvents();
     }
 
@@ -1113,6 +1825,12 @@ export class AppController {
             case 'aplicaciones':
                 await this.loadStaticSofiaData();
                 this.renderAplicacionesSofiaModule(content);
+                break;
+            case 'gastos':
+                content.innerHTML = renderGastosView();
+                break;
+            case 'secaderos':
+                content.innerHTML = renderSecaderosView();
                 break;
         }
     }
@@ -1249,24 +1967,99 @@ export class AppController {
     bindLoginEvents() {
         const form = document.getElementById('login-form');
         const errorDiv = document.getElementById('login-error');
+        const pendingDiv = document.getElementById('login-pending-error');
+        const successDiv = document.getElementById('login-success');
 
-        form?.addEventListener('submit', (e) => {
+        form?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
 
-            const user = UserModel.authenticate(email, password);
-            if (user) {
+            // Hide all messages
+            errorDiv?.classList.remove('show');
+            if (pendingDiv) pendingDiv.style.display = 'none';
+            if (successDiv) successDiv.style.display = 'none';
+
+            const user = await UserModel.authenticate(email, password);
+            if (user && user.pending) {
+                // User exists but is pending approval
+                if (pendingDiv) pendingDiv.style.display = 'block';
+            } else if (user) {
                 this.loadDashboard(user);
             } else {
-                errorDiv.classList.add('show');
-                setTimeout(() => errorDiv.classList.remove('show'), 3000);
+                if (errorDiv) {
+                    errorDiv.classList.add('show');
+                    setTimeout(() => errorDiv.classList.remove('show'), 3000);
+                }
             }
         });
 
         document.getElementById('btn-back-landing')?.addEventListener('click', (e) => {
             e.preventDefault();
             this.loadLanding();
+        });
+
+        // ── Registration Modal ──
+        const registerOverlay = document.getElementById('register-modal-overlay');
+
+        document.getElementById('btn-show-register')?.addEventListener('click', () => {
+            if (registerOverlay) registerOverlay.style.display = 'flex';
+        });
+
+        document.getElementById('btn-cancel-register')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (registerOverlay) registerOverlay.style.display = 'none';
+        });
+
+        registerOverlay?.addEventListener('click', (e) => {
+            if (e.target === registerOverlay) registerOverlay.style.display = 'none';
+        });
+
+        // ── Registration Form Submit ──
+        document.getElementById('form-register')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnSubmit = e.target.querySelector('button[type="submit"]');
+            const originalBtnText = btnSubmit?.textContent;
+
+            const regError = document.getElementById('register-error');
+            const regErrorMsg = document.getElementById('register-error-msg');
+
+            const name = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value;
+            const passwordConfirm = document.getElementById('register-password-confirm').value;
+
+            // Validate
+            if (password !== passwordConfirm) {
+                if (regError) { regError.style.display = 'block'; regErrorMsg.textContent = 'Las contraseñas no coinciden.'; }
+                return;
+            }
+            if (password.length < 6) {
+                if (regError) { regError.style.display = 'block'; regErrorMsg.textContent = 'La contraseña debe tener al menos 6 caracteres.'; }
+                return;
+            }
+
+            if (btnSubmit) { btnSubmit.disabled = true; btnSubmit.textContent = 'Procesando...'; }
+
+            const result = await UserModel.register(name, email, password);
+
+            if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.textContent = originalBtnText; }
+
+            if (result.error || result.success === false) {
+                if (regError) {
+                    regError.style.display = 'block';
+                    regErrorMsg.textContent = result.error || result.message;
+                }
+                return;
+            }
+
+            // Success - close modal and show success message on login page
+            if (registerOverlay) registerOverlay.style.display = 'none';
+            if (successDiv) {
+                const successMsg = document.getElementById('login-success-msg');
+                if (successMsg) successMsg.textContent = result.message || '¡Registro exitoso! Tu solicitud será revisada por un administrador.';
+                successDiv.style.display = 'block';
+            }
         });
     }
 
@@ -2200,10 +2993,10 @@ export class AppController {
         renderSplitChart('chart-fert-prod-espejo', 'El Espejo', 'sofia-fert-espejo', 'rgba(59, 130, 246, 0.7)', 'rgba(236, 72, 153, 0.7)');
         renderSplitChart('chart-fert-prod-fincasviejas', 'Fincas Viejas', 'sofia-fert-fincasviejas', 'rgba(245, 158, 11, 0.7)', 'rgba(16, 185, 129, 0.7)');
 
-        // 2. Timeline Charts (Weekly per-week Evolution) — one per finca with product filter
+        // 2. Timeline Charts (Weekly per-week Evolution) — one per finca with product + predio filter
         const weeklyConfigs = [
-            { id: 'chart-fert-weekly-ee', filterId: 'filter-weekly-producto-ee', finca: 'El Espejo', barColor: 'rgba(167, 139, 250, 0.7)', barBorder: 'rgba(167, 139, 250, 1)', lineColor: 'rgba(52, 211, 153, 1)' },
-            { id: 'chart-fert-weekly-fv', filterId: 'filter-weekly-producto-fv', finca: 'Fincas Viejas', barColor: 'rgba(96, 165, 250, 0.7)', barBorder: 'rgba(96, 165, 250, 1)', lineColor: 'rgba(251, 191, 36, 1)' }
+            { id: 'chart-fert-weekly-ee', filterId: 'filter-weekly-producto-ee', predioFilterId: 'filter-weekly-predio-ee', summaryId: 'weekly-summary-ee', finca: 'El Espejo', barColor: 'rgba(167, 139, 250, 0.7)', barBorder: 'rgba(167, 139, 250, 1)', lineColor: 'rgba(52, 211, 153, 1)' },
+            { id: 'chart-fert-weekly-fv', filterId: 'filter-weekly-producto-fv', predioFilterId: 'filter-weekly-predio-fv', summaryId: 'weekly-summary-fv', finca: 'Fincas Viejas', barColor: 'rgba(96, 165, 250, 0.7)', barBorder: 'rgba(96, 165, 250, 1)', lineColor: 'rgba(251, 191, 36, 1)' }
         ];
 
         const renderWeeklyChart = (cfg) => {
@@ -2219,7 +3012,53 @@ export class AppController {
 
             const filterEl = document.getElementById(cfg.filterId);
             const productoFilter = filterEl ? filterEl.value : '';
-            const weeklyData = SofiaImportModel.getWeeklyEvolution(this.sofiaFilters, cfg.finca, productoFilter);
+            const predioFilterEl = document.getElementById(cfg.predioFilterId);
+            const predioFilter = predioFilterEl ? predioFilterEl.value : '';
+            const weeklyData = SofiaImportModel.getWeeklyEvolution(this.sofiaFilters, cfg.finca, productoFilter, predioFilter);
+
+            // ── Update dynamic summary cards ──
+            const summaryEl = document.getElementById(cfg.summaryId);
+            if (summaryEl) {
+                const totalPptado = weeklyData.pptado.reduce((s, v) => s + v, 0);
+                const totalReal = weeklyData.real.reduce((s, v) => s + v, 0);
+                const desvio = totalReal - totalPptado;
+                const desvioPct = totalPptado > 0 ? Math.round((desvio / totalPptado) * 100) : 0;
+                const fmt = (v) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 }).format(v);
+
+                let estadoIcon, estadoColor, estadoBg, estadoBorder, estadoLabel;
+                if (desvio > 0) {
+                    // Over budget → danger (red)
+                    estadoIcon = '⛔'; estadoColor = '#ef4444';
+                    estadoBg = 'rgba(239, 68, 68, 0.1)'; estadoBorder = 'rgba(239, 68, 68, 0.3)';
+                    estadoLabel = 'Exceso';
+                } else if (desvio < 0) {
+                    // Under budget → warning (amber)
+                    estadoIcon = '⚠️'; estadoColor = '#f59e0b';
+                    estadoBg = 'rgba(245, 158, 11, 0.1)'; estadoBorder = 'rgba(245, 158, 11, 0.3)';
+                    estadoLabel = 'Falta';
+                } else {
+                    // On target → green
+                    estadoIcon = '✅'; estadoColor = '#10b981';
+                    estadoBg = 'rgba(16, 185, 129, 0.1)'; estadoBorder = 'rgba(16, 185, 129, 0.3)';
+                    estadoLabel = 'En objetivo';
+                }
+
+                summaryEl.innerHTML = `
+                    <div style="flex: 1; min-width: 160px; background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 12px; padding: 10px 16px;">
+                        <div style="font-size: 0.7em; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">🎯 Total Presupuestado</div>
+                        <div style="font-size: 1.3em; font-weight: 700; color: #10b981; font-family: 'Outfit';">${fmt(totalPptado)} <span style="font-size: 0.55em; font-weight: 400; color: var(--text-tertiary);">L</span></div>
+                    </div>
+                    <div style="flex: 1; min-width: 160px; background: rgba(167, 139, 250, 0.06); border: 1px solid rgba(167, 139, 250, 0.15); border-radius: 12px; padding: 10px 16px;">
+                        <div style="font-size: 0.7em; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">📦 Total Real Aplicado</div>
+                        <div style="font-size: 1.3em; font-weight: 700; color: var(--color-accent-400); font-family: 'Outfit';">${fmt(totalReal)} <span style="font-size: 0.55em; font-weight: 400; color: var(--text-tertiary);">L</span></div>
+                    </div>
+                    <div style="flex: 1; min-width: 180px; background: ${estadoBg}; border: 1px solid ${estadoBorder}; border-radius: 12px; padding: 10px 16px;">
+                        <div style="font-size: 0.7em; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">${estadoIcon} Estado</div>
+                        <div style="font-size: 1.3em; font-weight: 700; color: ${estadoColor}; font-family: 'Outfit';">${desvio > 0 ? '+' : ''}${fmt(desvio)} L <span style="font-size: 0.55em; font-weight: 500;">(${desvioPct > 0 ? '+' : ''}${desvioPct}%)</span></div>
+                        <div style="font-size: 0.7em; color: ${estadoColor}; font-weight: 600; margin-top: 2px;">${estadoLabel}</div>
+                    </div>
+                `;
+            }
 
             this.charts[chartKey] = new Chart(ctx, {
                 type: 'bar',
@@ -2283,11 +3122,28 @@ export class AppController {
         };
 
         weeklyConfigs.forEach(cfg => {
+            // Populate predio filter dropdown dynamically
+            const predioEl = document.getElementById(cfg.predioFilterId);
+            if (predioEl && predioEl.options.length <= 1) {
+                const predios = SofiaImportModel.getPredios(cfg.finca);
+                predios.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p;
+                    opt.textContent = p;
+                    opt.style.color = '#000';
+                    predioEl.appendChild(opt);
+                });
+            }
+
             renderWeeklyChart(cfg);
             // Bind product filter change
             const filterEl = document.getElementById(cfg.filterId);
             if (filterEl) {
                 filterEl.addEventListener('change', () => renderWeeklyChart(cfg));
+            }
+            // Bind predio filter change
+            if (predioEl) {
+                predioEl.addEventListener('change', () => renderWeeklyChart(cfg));
             }
         });
 

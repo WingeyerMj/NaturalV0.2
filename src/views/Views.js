@@ -160,6 +160,14 @@ export function renderLoginPage() {
           ⚠️ <span>Credenciales incorrectas. Intente nuevamente.</span>
         </div>
 
+        <div class="form-success" id="login-success" style="display:none; background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); border-radius: 8px; padding: var(--space-4); margin-bottom: var(--space-4); color: #22c55e; font-size: 0.9em; text-align: center;">
+          ✅ <span id="login-success-msg">Registro exitoso</span>
+        </div>
+
+        <div class="form-error" id="login-pending-error" style="display:none; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; padding: var(--space-4); margin-bottom: var(--space-4); color: #f59e0b; font-size: 0.9em; text-align: center;">
+          ⏳ <span>Tu cuenta está pendiente de aprobación por el administrador.</span>
+        </div>
+
         <form id="login-form" autocomplete="off">
           <div class="form-group">
             <label class="form-label" for="login-email">Correo electrónico</label>
@@ -196,18 +204,71 @@ export function renderLoginPage() {
           </button>
         </form>
 
+        <div style="margin-top: var(--space-4); text-align: center;">
+          <p style="font-size: var(--text-sm); color: var(--text-tertiary); margin-bottom: var(--space-3);">¿No tenés cuenta?</p>
+          <button class="btn btn-ghost" id="btn-show-register" style="color: var(--color-primary-400); font-weight: 600; border: 1px solid var(--color-primary-400); width: 100%; padding: var(--space-3); border-radius: var(--radius-lg); transition: all 0.2s ease;">
+            📝 Registrarse
+          </button>
+        </div>
+
         <div class="login-footer">
           <a href="#" id="btn-back-landing">← Volver al inicio</a>
         </div>
+      </div>
 
-        <div style="margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle);">
-          <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-bottom: var(--space-3); text-align: center;">Cuentas de demostración:</p>
-          <div style="display: grid; gap: var(--space-2); font-size: var(--text-xs); color: var(--text-tertiary);">
-            <div style="display: flex; justify-content: space-between;"><span>Admin:</span><code style="color: var(--color-primary-400);">admin@naturalfood.com / admin123</code></div>
-            <div style="display: flex; justify-content: space-between;"><span>Ingeniero:</span><code style="color: var(--color-primary-400);">ingeniero@naturalfood.com / ing123</code></div>
-            <div style="display: flex; justify-content: space-between;"><span>RRHH:</span><code style="color: var(--color-primary-400);">rrhh@naturalfood.com / rrhh123</code></div>
-            <div style="display: flex; justify-content: space-between;"><span>Carga:</span><code style="color: var(--color-primary-400);">carga@naturalfood.com / carga123</code></div>
-            <div style="display: flex; justify-content: space-between;"><span>Sub-Admin:</span><code style="color: var(--color-primary-400);">subadmin@naturalfood.com / sub123</code></div>
+      <!-- Registration Modal -->
+      <div id="register-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+        <div style="background: var(--bg-secondary); border-radius: 16px; padding: var(--space-8); max-width: 480px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid var(--border-subtle);">
+          <div style="text-align: center; margin-bottom: var(--space-6);">
+            <img src="https://www.naturalfoodargentina.com/wp-content/themes/naturalfoodargentina/img/favicon.png" alt="NaturalFood" style="width: 60px; height: 60px; margin-bottom: var(--space-3);">
+            <h3 style="font-family: 'Outfit'; color: var(--text-primary); margin-bottom: var(--space-1);">Crear Cuenta</h3>
+            <p style="font-size: var(--text-sm); color: var(--text-tertiary);">Completá tus datos para solicitar acceso</p>
+          </div>
+
+          <div class="form-error" id="register-error" style="display:none; margin-bottom: var(--space-4);">
+            ⚠️ <span id="register-error-msg"></span>
+          </div>
+
+          <form id="form-register" autocomplete="off">
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+              <label class="form-label" for="register-name">Nombre Completo</label>
+              <div class="form-input-wrapper">
+                <input type="text" id="register-name" class="form-input" placeholder="Ej: Juan Pérez" required />
+                <span class="form-input-icon">👤</span>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+              <label class="form-label" for="register-email">Correo Electrónico</label>
+              <div class="form-input-wrapper">
+                <input type="email" id="register-email" class="form-input" placeholder="tucorreo@ejemplo.com" required />
+                <span class="form-input-icon">📧</span>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+              <label class="form-label" for="register-password">Contraseña</label>
+              <div class="form-input-wrapper">
+                <input type="password" id="register-password" class="form-input" placeholder="Mínimo 6 caracteres" required minlength="6" />
+                <span class="form-input-icon">🔒</span>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: var(--space-6);">
+              <label class="form-label" for="register-password-confirm">Confirmar Contraseña</label>
+              <div class="form-input-wrapper">
+                <input type="password" id="register-password-confirm" class="form-input" placeholder="Repetí tu contraseña" required minlength="6" />
+                <span class="form-input-icon">🔒</span>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary login-btn" style="width: 100%;">
+              Solicitar Acceso
+            </button>
+          </form>
+
+          <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-4); text-align: center; line-height: 1.5;">
+            Tu solicitud será revisada por un administrador.<br>Recibirás un correo cuando tu cuenta sea activada.
+          </p>
+
+          <div style="text-align: center; margin-top: var(--space-4);">
+            <a href="#" id="btn-cancel-register" style="color: var(--text-tertiary); font-size: var(--text-sm); text-decoration: none;">← Volver al inicio de sesión</a>
           </div>
         </div>
       </div>
@@ -794,15 +855,20 @@ export function renderCargaView(labores, fincas, predios, empleados) {
 // ── Informes (Reports) View ──
 export function renderInformesView() {
   return `
-    <div class="tabs" id="informes-tabs">
-      <button class="tab-btn active" data-tab="presupuesto">Ejecución Presupuestaria</button>
-      <button class="tab-btn" data-tab="labores">Labores de Campo</button>
-      <button class="tab-btn" data-tab="parametros">Parámetros</button>
-      <button class="tab-btn" data-tab="aplicaciones">📋 Aplicaciones Sofía</button>
-    </div>
-
-    <div id="informe-content">
-      <!-- Will be filled dynamically -->
+    <div class="informes-container">
+      <aside class="informes-nav" id="informes-tabs">
+        <div class="informes-nav-header">REPORTES</div>
+        <button class="tab-btn active" data-tab="presupuesto">📊 Ejecución</button>
+        <button class="tab-btn" data-tab="labores">🚜 Labores</button>
+        <button class="tab-btn" data-tab="parametros">⚙️ Parámetros</button>
+        <button class="tab-btn" data-tab="aplicaciones">📋 Aplicaciones</button>
+        <button class="tab-btn" data-tab="gastos">💰 Gastos</button>
+        <button class="tab-btn" data-tab="secaderos">☀️ Secaderos</button>
+      </aside>
+  
+      <div id="informe-content" class="informes-content">
+        <!-- Contenido dinámico -->
+      </div>
     </div>
   `;
 }
@@ -897,18 +963,19 @@ export function renderInformePresupuesto(budgetData) {
   `;
 }
 
-export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCycle = '2025-2026') {
+export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCycle = '2025-2026', userRole = 'Administrador') {
   const fmt = (v) => new Intl.NumberFormat('es-AR').format(Math.round(v));
   const fmtDec = (v) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 1 }).format(v);
   const fmtMoney = (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(v);
 
   const totalJornadas = laborStats.reduce((acc, s) => acc + s.totalJornadas, 0);
+  const isAdmin = userRole === 'Administrador';
 
   const cycles = ['2025-2026', '2024-2025', '2023-2024', '2022-2023', '2021-2022'];
 
   return `
     <div class="dashboard-grid animate-fade-in" style="margin-bottom: var(--space-6);">
-      <!-- Budget Upload Zone -->
+      ${isAdmin ? `<!-- Budget Upload Zone -->
       <div class="sofia-upload-zone" id="jornales-budget-upload" style="margin: 0; padding: var(--space-6); background: var(--bg-glass); display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <div style="font-size: 2.5rem; margin-bottom: var(--space-2);">📄</div>
         <h4 style="font-family: 'Outfit'; margin-bottom: var(--space-1);">Presupuesto de Jornales</h4>
@@ -917,7 +984,7 @@ export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCyc
         <button class="btn btn-secondary btn-sm" onclick="document.getElementById('input-budget-csv').click()">
           Seleccionar CSV
         </button>
-      </div>
+      </div>` : ''}
 
       <!-- Chart Container -->
       <div class="data-table-container" style="margin: 0; padding: var(--space-6);">
@@ -984,7 +1051,7 @@ export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCyc
     <div class="data-table-container animate-fade-in animate-delay-3">
       <div class="table-header" style="justify-content: space-between;">
         <h3 style="display: flex; align-items: center; gap: var(--space-3);">
-          💲 Costo Total por Predio (ARS)
+          💲 Costo Total por Predio
           <select id="table-jornales-cycle" class="form-select" style="font-size: 0.8em; padding: 4px 8px; width: auto; background: var(--bg-secondary);">
             ${cycles.map(c => `<option value="${c}" ${c === currentCycle ? 'selected' : ''}>${c}</option>`).join('')}
           </select>
@@ -993,18 +1060,20 @@ export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCyc
       <table class="data-table">
         <thead>
           <tr>
-            <th>Predio</th>
             <th>Finca</th>
+            <th>Predio</th>
             <th style="text-align: right;">Costo Total (ARS)</th>
+            <th style="text-align: right;">Costo Total (USD)</th>
             <th style="text-align: right;">Jornadas</th>
           </tr>
         </thead>
         <tbody>
           ${efficiencyStats.predios.slice().sort((a, b) => b.costoArs - a.costoArs).map(p => `
               <tr>
-                <td><strong>${p.name}</strong></td>
                 <td><span style="font-size: 0.9em; color: var(--text-tertiary);">${p.group}</span></td>
+                <td><strong>${p.name}</strong></td>
                 <td style="text-align: right; color: var(--color-primary-500); font-weight: 600;">${fmtMoney(p.costoArs)}</td>
+                <td style="text-align: right; color: #22c55e; font-weight: 600;">US${fmtMoney(p.costoUsd || 0)}</td>
                 <td style="text-align: right;">${fmt(p.jornales)}</td>
               </tr>
             `).join('')}
@@ -1013,6 +1082,7 @@ export function renderSofiaJornalesStats(laborStats, efficiencyStats, currentCyc
           <tr>
             <td colspan="2">TOTAL</td>
             <td style="text-align: right; color: var(--color-primary-600);">${fmtMoney(efficiencyStats.predios.reduce((acc, p) => acc + p.costoArs, 0))}</td>
+            <td style="text-align: right; color: #16a34a;">US${fmtMoney(efficiencyStats.predios.reduce((acc, p) => acc + (p.costoUsd || 0), 0))}</td>
             <td style="text-align: right;">${fmt(efficiencyStats.predios.reduce((acc, p) => acc + p.jornales, 0))}</td>
           </tr>
         </tfoot>
@@ -1335,55 +1405,11 @@ export function renderPresupuestoView(presupuestos) {
   `;
 }
 
-// ── Usuarios View ──
-export function renderUsuariosView(usuarios) {
-  return `
-    <div class="data-table-container animate-fade-in">
-      <div class="table-header">
-        <h3>Gestión de Usuarios</h3>
-        <div class="table-actions">
-          <button class="btn btn-primary btn-sm" id="btn-add-usuario">+ Nuevo Usuario</button>
-        </div>
-      </div>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Avatar</th>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Rol</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${usuarios.map(u => `
-            <tr>
-              <td>
-                <div class="sidebar-avatar" style="width: 32px; height: 32px; font-size: var(--text-xs);">${u.avatar}</div>
-              </td>
-              <td><strong>${u.name}</strong></td>
-              <td style="color: var(--text-secondary);">${u.email}</td>
-              <td>
-                <span class="status-badge ${u.role === 'Administrador' ? 'active' : 'pending'}" style="background: rgba(168, 85, 247, 0.1); color: var(--color-accent-400);">
-                  ${u.role}
-                </span>
-              </td>
-              <td>
-                <span class="status-badge ${u.active ? 'active' : 'inactive'}">
-                  <span class="status-dot"></span>
-                  ${u.active ? 'Activo' : 'Inactivo'}
-                </span>
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
+// renderUsuariosView movida al final del archivo
 
-export function renderCosechaDashboard(stats) {
+export function renderCosechaDashboard(stats, userRole = 'Administrador') {
   const formatKg = (v) => new Intl.NumberFormat('es-AR').format(Math.round(v));
+  const isAdmin = userRole === 'Administrador';
 
   return `
     <div class="dashboard-grid animate-fade-in" style="margin-bottom: var(--space-6);">
@@ -1414,6 +1440,17 @@ export function renderCosechaDashboard(stats) {
         <div class="metric-label">VARIEDADES</div>
         <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Tipos de uva cosechados</p>
       </div>
+
+      ${isAdmin ? `<div class="metric-card">
+        <div class="metric-card-header">
+          <div class="metric-card-icon blue">🎯</div>
+        </div>
+        <div class="metric-value">
+            <input type="number" id="input-expectativa" class="form-input" style="width: 100px; font-size: 0.8em; font-weight: bold; background: transparent; border: 1px solid var(--border-subtle); padding: 5px; color: var(--text-primary); border-radius: 4px;" placeholder="Ej: 1500000" value="${stats.expectativaKg || ''}">
+            <small style="font-size: 0.5em; color: var(--text-tertiary);">kg</small>
+        </div>
+        <div class="metric-label">EXPECTATIVA DEL CICLO</div>
+      </div>` : ''}
     </div>
 
     <!-- Lists Row -->
@@ -1522,6 +1559,14 @@ export function renderCosechaDashboard(stats) {
                 <option value="2022-2023">2022-2023</option>
                 <option value="2021-2022">2021-2022</option>
                 <option value="2020-2021">2020-2021</option>
+                <option value="2019-2020">2019-2020</option>
+                <option value="2018-2019">2018-2019</option>
+                <option value="2017-2018">2017-2018</option>
+                <option value="2016-2017">2016-2017</option>
+                <option value="2015-2016">2015-2016</option>
+                <option value="2014-2015">2014-2015</option>
+                <option value="2013-2014">2013-2014</option>
+                <option value="2012-2013">2012-2013</option>
             </select>
         </div>
     </div>
@@ -1603,7 +1648,7 @@ export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentC
          </select>
          <label class="form-label" style="margin:0; margin-left: var(--space-2); font-size: 0.85em;">Ciclo:</label>
          <select class="form-select sofia-filter-select" id="filter-cl-ciclo" style="padding: 4px 12px; font-size: 0.9em;">
-            ${['2025-2026', '2024-2025', '2023-2024', '2022-2023', '2021-2022', '2020-2021'].map(c =>
+            ${['2025-2026', '2024-2025', '2023-2024', '2022-2023', '2021-2022', '2020-2021', '2019-2020', '2018-2019', '2017-2018', '2016-2017', '2015-2016', '2014-2015', '2013-2014', '2012-2013'].map(c =>
     `<option value="${c}" ${currentCiclo === c ? 'selected' : ''}>${c}</option>`
   ).join('')}
          </select>
@@ -1714,7 +1759,204 @@ export function renderCosechaLevantadoTable(clStats, currentFinca = '', currentC
   `;
 }
 
+export function renderWorkLogView(data, catalogs) {
+  const { fincas, predios, cuarteles, faenas, empleados, productos } = catalogs;
 
+  // Catalog subsets
+  const insumosFull = productos.filter(p => p.categoria === 'Insumo' && p.status === 'active');
+  const herramientasFull = productos.filter(p => p.categoria === 'Herramienta' && p.status === 'active');
+
+  // Helper formatting names
+  const getFincaName = (id) => fincas.find(f => f.id == id)?.nombre || id;
+  const getPredioName = (id) => predios.find(p => p.id == id)?.nombre || id;
+  const getCuartelName = (id) => cuarteles.find(c => c.id == id)?.numero || id;
+  const getFaenaName = (id) => faenas.find(f => f.id == id)?.nombre || id;
+  const getEmpleadoName = (id) => empleados.find(e => e.id == id)?.name || id;
+
+  const tableData = data.filter(d => d.status === 'active');
+
+  return `
+    <div class="data-table-container animate-fade-in">
+      <div class="table-header">
+        <h3 style="display: flex; align-items: center; gap: var(--space-2);">🚜 Carga de Trabajo de Campo</h3>
+        <div class="table-actions">
+          <div class="search-input-wrapper" style="width: 280px;">
+             <span class="search-icon">🔍</span>
+             <input type="text" class="search-input" id="search-work-logs" placeholder="Filtrar por empleado..." />
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-add-work-log" style="display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4);">
+            <span style="font-size: 1.2em;">+</span> Cargar Jornal
+          </button>
+        </div>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="data-table" id="table-work-logs">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Empleado</th>
+              <th>Lugar / Ubicación</th>
+              <th>Tarea / Labor</th>
+              <th style="text-align: right;">Cant.</th>
+              <th style="text-align: center;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableData.length === 0 ? `
+              <tr>
+                <td colspan="6" style="text-align: center; padding: var(--space-10); color: var(--text-tertiary);">
+                  No se han registrado trabajos.
+                </td>
+              </tr>
+            ` : tableData.map(row => `
+              <tr data-id="${row.id}">
+                <td>${new Date(row.fecha).toLocaleDateString('es-AR')}</td>
+                <td style="font-weight: 600; color: var(--color-primary-400);">${row.empleado_nombre || getEmpleadoName(row.empleado_id)}</td>
+                <td><small style="opacity: 0.8;">${row.finca_nombre || getFincaName(row.finca_id)} > ${row.predio_nombre || getPredioName(row.predio_id)} > C${row.cuartel_numero || getCuartelName(row.cuartel_id)}</small></td>
+                <td><span style="padding: 4px 8px; background: rgba(139, 92, 246, 0.1); color: var(--color-primary-300); border-radius: 4px; font-size: 0.9em;">
+                   ${row.faena_nombre || getFaenaName(row.faena_id)}
+                   ${row.labor_nombre ? ` > <span style="opacity:0.8; font-size:0.9em;">${row.labor_nombre}</span>` : ''}
+                </span></td>
+                <td style="text-align: right; font-weight: 700;">${row.cantidad} <small style="color: var(--text-tertiary); font-weight: 400;">${row.unidad}</small></td>
+                <td style="text-align: center;">
+                  <button class="btn btn-sm btn-ghost btn-delete-work-log" data-id="${row.id}" style="color: var(--color-error); opacity: 0.7;">🗑️</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal Formulario Carga de Trabajo -->
+    <div id="work-log-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(8px); align-items:center; justify-content:center;">
+      <div style="background: var(--bg-secondary); border-radius: 20px; padding: var(--space-8); max-width: 800px; width: 94%; box-shadow: 0 40px 100px -20px rgba(0,0,0,0.8); border: 1px solid var(--border-subtle); max-height: 90vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-6);">
+          <h3>🚜 Registro de Jornal / Trabajo Diario</h3>
+          <button type="button" class="btn btn-ghost" id="btn-close-work-modal" style="font-size: 1.5em; padding: 0;">×</button>
+        </div>
+
+        <form id="form-work-log" autocomplete="off">
+          <!-- Datos Generales -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-6);">
+            <div class="form-group">
+              <label class="form-label">Fecha de Trabajo</label>
+              <input type="date" id="work-fecha" class="form-input" required value="${new Date().toISOString().split('T')[0]}" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Personal Responsable</label>
+              <select id="work-empleado" class="form-select" required>
+                <option value="">Seleccionar empleado...</option>
+                ${empleados.map(e => `<option value="${e.id}">${e.name} (${e.legajo})</option>`).join('')}
+              </select>
+            </div>
+          </div>
+
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); padding: var(--space-5); border-radius: 12px; margin-bottom: var(--space-6);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-4);">
+              <div class="form-group">
+                <label class="form-label">Finca</label>
+                <select id="work-finca" class="form-select" required>
+                  <option value="">Seleccionar...</option>
+                  ${fincas.map(f => `<option value="${f.id}">${f.nombre}</option>`).join('')}
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Predio / Lote</label>
+                <select id="work-predio" class="form-select" disabled required><option value="">Puntualizando...</option></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Cuartel / Cuadro</label>
+                <select id="work-cuartel" class="form-select" disabled required><option value="">Ubicando...</option></select>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-6); padding: var(--space-5); background: rgba(139, 92, 246, 0.05); border-radius: 12px; border: 1px solid var(--border-subtle);">
+            <div class="form-group">
+              <label class="form-label">Labor o Tarea Realizada</label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2);">
+                  <select id="work-faena" class="form-select" required>
+                    <option value="">Faena General...</option>
+                    ${faenas.map(f => `<option value="${f.id}">${f.nombre}</option>`).join('')}
+                  </select>
+                  <select id="work-labor" class="form-select" disabled>
+                    <option value="">Labor Específica...</option>
+                  </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cantidad</label>
+              <input type="number" step="any" id="work-cantidad" class="form-input" required placeholder="0.00" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unidad</label>
+              <select id="work-unidad" class="form-select">
+                <option value="horas">Horas</option>
+                <option value="jornal">Jornal</option>
+                <option value="surcos">Surcos</option>
+                <option value="plantas">Plantas</option>
+                <option value="kg">Kg</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Insumos (Salida de Bodega) -->
+          <div style="margin-bottom: var(--space-6); border-top: 1px solid var(--border-subtle); padding-top: var(--space-4);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
+              <h4 style="font-size: 0.85em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.1em;">📦 Insumos / Suministros (Deducción Stock)</h4>
+              <button type="button" class="btn btn-sm btn-ghost" id="btn-add-insumo-row" style="color: var(--color-primary-400); font-weight: 600;">+ Agregar Fila</button>
+            </div>
+            <div id="insumos-list-container" style="display: grid; grid-template-columns: 1fr; gap: var(--space-2);">
+              <!-- Filas de insumos dinámicas -->
+            </div>
+          </div>
+
+          <!-- Herramientas -->
+          <div style="margin-bottom: var(--space-6); border-top: 1px solid var(--border-subtle); padding-top: var(--space-4);">
+             <h4 style="font-size: 0.85em; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.1em; margin-bottom: var(--space-3);">🔧 Herramientas Utilizadas</h4>
+             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); max-height: 150px; overflow-y: auto; padding: var(--space-4); background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: 8px;">
+               ${herramientasFull.map(h => `
+                 <label style="display: flex; align-items: center; gap: var(--space-3); cursor: pointer; font-size: 0.9em; padding: var(--space-1); transition: color 0.2s ease;" onmouseover="this.style.color='var(--color-primary-400)'" onmouseout="this.style.color='inherit'">
+                   <input type="checkbox" name="work-tools" value="${h.id}" style="accent-color: var(--color-primary-400);" />
+                   ${h.nombre}
+                 </label>
+               `).join('')}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Notas Adicionales</label>
+            <textarea id="work-notas" class="form-input" style="min-height: 80px; padding: var(--space-3);" placeholder="Describa cualquier observación o incidencia..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: var(--space-4); justify-content: flex-end; margin-top: var(--space-8);">
+            <button type="button" class="btn btn-ghost" id="btn-cancel-work-log" style="padding: var(--space-2) var(--space-8);">Cancelar</button>
+            <button type="submit" class="btn btn-primary" style="padding: var(--space-2) var(--space-12); font-weight: 600;">💾 Registrar Trabajo</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Template Insumo -->
+    <template id="template-insumo-item">
+      <div class="insumo-row animate-slide-up" style="display: grid; grid-template-columns: 3fr 1fr 40px; gap: var(--space-3); align-items: flex-end; padding: var(--space-3); background: rgba(255,255,255,0.01); border: 1px dashed var(--border-subtle); border-radius: 10px;">
+        <div class="form-group">
+          <label style="font-size: 0.7em; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 2px;">Producto</label>
+          <select class="form-select select-insumo-id" required style="border-style: none none solid none; border-radius: 0;">
+            <option value="">Seleccionar insumo...</option>
+            ${insumosFull.map(i => `<option value="${i.id}">${i.nombre} (Dispo: ${i.stock})</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label style="font-size: 0.7em; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 2px;">Cant.</label>
+          <input type="number" step="any" class="form-input input-insumo-qty" required placeholder="0.0" style="border-style: none none solid none; border-radius: 0; padding-left: 0;" />
+        </div>
+        <button type="button" class="btn btn-sm btn-ghost btn-remove-insumo" style="color: var(--color-error); margin-bottom: 5px; font-size: 1.2em;">×</button>
+      </div>
+    </template>
+  `;
+}
 // ── Utility Functions ──
 function formatDate(dateStr) {
   const date = new Date(dateStr + 'T00:00:00');
@@ -2073,31 +2315,49 @@ export function renderFertilizacionComparativa(data) {
       <div class="chart-container" style="min-height: 400px; padding: var(--space-6); grid-column: 1 / -1;">
           <div class="chart-header" style="color: var(--color-primary-400); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3);">
             <span class="chart-title">📈 🍇 El Espejo — Aplicación Semanal (L)</span>
-            <div style="display: flex; align-items: center; gap: var(--space-2);">
-              <label for="filter-weekly-producto-ee" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Producto:</label>
-              <select id="filter-weekly-producto-ee" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none;">
-                <option value="" style="color:#000;">Todos los productos</option>
-                <option value="NUTRI 1075 M" style="color:#000;">NUTRI 1075 M</option>
-                <option value="NUTRI 1683 M" style="color:#000;">NUTRI 1683 M</option>
-                <option value="NUTRI 1684 M" style="color:#000;">NUTRI 1684 M</option>
-              </select>
+            <div style="display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <label for="filter-weekly-predio-ee" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Predio:</label>
+                <select id="filter-weekly-predio-ee" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none; transition: border-color 0.2s;">
+                  <option value="" style="color:#000;">Todos los predios</option>
+                </select>
+              </div>
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <label for="filter-weekly-producto-ee" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Producto:</label>
+                <select id="filter-weekly-producto-ee" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none;">
+                  <option value="" style="color:#000;">Todos los productos</option>
+                  <option value="NUTRI 1075 M" style="color:#000;">NUTRI 1075 M</option>
+                  <option value="NUTRI 1683 M" style="color:#000;">NUTRI 1683 M</option>
+                  <option value="NUTRI 1684 M" style="color:#000;">NUTRI 1684 M</option>
+                </select>
+              </div>
             </div>
           </div>
+          <div id="weekly-summary-ee" style="display: flex; gap: var(--space-4); flex-wrap: wrap; margin: var(--space-4) 0;"></div>
           <div class="chart-canvas-wrapper" style="height:350px;"><canvas id="chart-fert-weekly-ee"></canvas></div>
       </div>
       <div class="chart-container" style="min-height: 400px; padding: var(--space-6); grid-column: 1 / -1;">
           <div class="chart-header" style="color: var(--color-amber-400); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3);">
             <span class="chart-title">📈 🌾 Fincas Viejas — Aplicación Semanal (L)</span>
-            <div style="display: flex; align-items: center; gap: var(--space-2);">
-              <label for="filter-weekly-producto-fv" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Producto:</label>
-              <select id="filter-weekly-producto-fv" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none;">
-                <option value="" style="color:#000;">Todos los productos</option>
-                <option value="NUTRI 1075 M" style="color:#000;">NUTRI 1075 M</option>
-                <option value="NUTRI 1683 M" style="color:#000;">NUTRI 1683 M</option>
-                <option value="NUTRI 1684 M" style="color:#000;">NUTRI 1684 M</option>
-              </select>
+            <div style="display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <label for="filter-weekly-predio-fv" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Predio:</label>
+                <select id="filter-weekly-predio-fv" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none; transition: border-color 0.2s;">
+                  <option value="" style="color:#000;">Todos los predios</option>
+                </select>
+              </div>
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <label for="filter-weekly-producto-fv" style="font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--text-tertiary);">Producto:</label>
+                <select id="filter-weekly-producto-fv" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-family: 'Inter'; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 180px; outline: none;">
+                  <option value="" style="color:#000;">Todos los productos</option>
+                  <option value="NUTRI 1075 M" style="color:#000;">NUTRI 1075 M</option>
+                  <option value="NUTRI 1683 M" style="color:#000;">NUTRI 1683 M</option>
+                  <option value="NUTRI 1684 M" style="color:#000;">NUTRI 1684 M</option>
+                </select>
+              </div>
             </div>
           </div>
+          <div id="weekly-summary-fv" style="display: flex; gap: var(--space-4); flex-wrap: wrap; margin: var(--space-4) 0;"></div>
           <div class="chart-canvas-wrapper" style="height:350px;"><canvas id="chart-fert-weekly-fv"></canvas></div>
       </div>
     </div>
@@ -2110,7 +2370,7 @@ export function renderFertilizacionComparativa(data) {
     <table class="data-table">
       <thead><tr>
         <th>Predio / Cuartel</th><th>Producto</th><th>Pre-Cos. (L)</th><th>Pos-Cos. (L)</th>
-        <th>Comprado (L)</th><th>Real (L)</th><th>Desvío</th><th>%</th>
+        <th>Comprado (L)</th><th>Real (L)</th><th>Estado</th><th>%</th>
       </tr></thead>
       <tbody>
         ${data.length === 0 ? '<tr><td colspan="8" style="text-align:center;color:var(--text-tertiary);padding:var(--space-8);">Sin registros</td></tr>' :
@@ -2139,8 +2399,8 @@ export function renderFertilizacionComparativa(data) {
             <td>${formatCurrency(r.pos)}</td>
             <td style="font-weight:600;">${formatCurrency(r.metaAnual)}</td>
             <td style="font-weight:600; color:var(--color-accent-400)">${formatCurrency(r.real)}</td>
-            <td><span class="desvio-badge ${r.desvio > 0 ? 'over' : r.desvio < 0 ? 'under' : 'on-target'}">${r.desvio > 0 ? '+' : ''}${formatCurrency(r.desvio)}</span></td>
-            <td><span class="desvio-badge ${r.desvioPct > 0 ? 'over' : r.desvioPct < 0 ? 'under' : 'on-target'}">${r.desvioPct > 0 ? '+' : ''}${r.desvioPct}%</span></td>
+            <td><span class="desvio-badge ${r.desvio > 0 ? 'over' : r.desvio < 0 ? 'under' : 'on-target'}">${r.desvio > 0 ? '⛔ +' : r.desvio < 0 ? '⚠️ ' : '✅ '}${formatCurrency(r.desvio)}</span></td>
+            <td><span class="desvio-badge ${r.desvioPct > 0 ? 'over' : r.desvioPct < 0 ? 'under' : 'on-target'}">${r.desvioPct > 0 ? '⛔ +' : r.desvioPct < 0 ? '⚠️ ' : '✅ '}${r.desvioPct}%</span></td>
           </tr>
           `).join('')}
         `).join('');
@@ -2149,5 +2409,439 @@ export function renderFertilizacionComparativa(data) {
     </table>
   </div>
 `;
+}
+
+// ── Gestión de Usuarios View ──
+export function renderUsuariosView(users, roles) {
+  const pendingUsers = users.filter(u => u.pending && !u.active);
+  const regularUsers = users.filter(u => !u.pending || u.active);
+
+  return `
+    ${pendingUsers.length > 0 ? `
+    <div class="data-table-container animate-fade-in" style="margin-bottom: var(--space-6); border: 1px solid rgba(245,158,11,0.3);">
+      <div class="table-header" style="background: rgba(245,158,11,0.08);">
+        <h3 style="display: flex; align-items: center; gap: var(--space-3);">
+          ⏳ Solicitudes Pendientes
+          <span style="background: #f59e0b; color: #000; font-size: 0.7em; padding: 2px 8px; border-radius: 12px; font-weight: 700;">${pendingUsers.length}</span>
+        </h3>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Avatar</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Fecha Solicitud</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pendingUsers.map(u => `
+            <tr data-id="${u.id}">
+              <td>
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8em; color: white;">
+                  ${u.avatar}
+                </div>
+              </td>
+              <td><strong>${u.name}</strong></td>
+              <td><code style="color: var(--color-primary-400); font-size: 0.9em;">${u.email}</code></td>
+              <td style="font-size: 0.85em; color: var(--text-tertiary);">${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString('es-AR') : '—'}</td>
+              <td>
+                <div style="display: flex; gap: var(--space-2);">
+                  <button class="btn btn-sm btn-approve-usuario" data-id="${u.id}" style="background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); padding: 4px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+                    ✅ Aprobar
+                  </button>
+                  <button class="btn btn-sm btn-reject-usuario" data-id="${u.id}" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 4px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+                    ❌ Rechazar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    ` : ''}
+
+    <div class="data-table-container animate-fade-in">
+      <div class="table-header">
+        <h3>👥 Gestión de Usuarios</h3>
+        <div class="table-actions">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Buscar usuario..." id="search-usuarios" />
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-add-usuario">+ Nuevo Usuario</button>
+        </div>
+      </div>
+      <table class="data-table" id="table-usuarios">
+        <thead>
+          <tr>
+            <th>Avatar</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${regularUsers.map(u => `
+            <tr data-id="${u.id}">
+              <td>
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8em; color: white;">
+                  ${u.avatar}
+                </div>
+              </td>
+              <td><strong>${u.name}</strong></td>
+              <td><code style="color: var(--color-primary-400); font-size: 0.9em;">${u.email}</code></td>
+              <td>
+                <span style="padding: 4px 10px; border-radius: 12px; font-size: 0.8em; font-weight: 600;
+                  background: ${u.role === 'Administrador' ? 'rgba(239, 68, 68, 0.15); color: #ef4444' :
+      u.role === 'Ingeniero' ? 'rgba(59, 130, 246, 0.15); color: #3b82f6' :
+        u.role === 'Sub-Admin' ? 'rgba(168, 85, 247, 0.15); color: #a855f7' :
+          'rgba(74, 222, 128, 0.15); color: #4ade80'};">
+                  ${u.role}
+                </span>
+              </td>
+              <td>
+                <span class="status-badge ${u.active ? 'active' : 'inactive'}">
+                  <span class="status-dot"></span>
+                  ${u.active ? 'Activo' : 'Inactivo'}
+                </span>
+              </td>
+              <td>
+                <div style="display: flex; gap: var(--space-2);">
+                  <button class="btn btn-sm btn-ghost btn-edit-usuario" data-id="${u.id}" title="Editar">✏️</button>
+                  <button class="btn btn-sm btn-ghost btn-delete-usuario" data-id="${u.id}" title="${u.active ? 'Desactivar' : 'Activar'}" style="color: ${u.active ? 'var(--color-error)' : 'var(--color-success)'};">
+                    ${u.active ? '🗑️' : '✅'}
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal Formulario Usuario -->
+    <div id="user-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+      <div style="background: var(--bg-secondary); border-radius: 16px; padding: var(--space-8); max-width: 480px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid var(--border-subtle);">
+        <h3 id="user-modal-title" style="font-family: 'Outfit'; margin-bottom: var(--space-6); color: var(--text-primary);">Nuevo Usuario</h3>
+        <form id="form-usuario" autocomplete="off">
+          <input type="hidden" id="user-edit-id" value="">
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" for="user-name">Nombre Completo</label>
+            <input type="text" id="user-name" class="form-input" style="padding-left: var(--space-4);" placeholder="Ej: Juan Pérez" required />
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" for="user-email">Email</label>
+            <input type="email" id="user-email" class="form-input" style="padding-left: var(--space-4);" placeholder="usuario@naturalfood.com" required />
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" for="user-password">Contraseña</label>
+            <input type="text" id="user-password" class="form-input" style="padding-left: var(--space-4);" placeholder="••••••••" />
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-6);">
+            <label class="form-label" for="user-role">Rol</label>
+            <select id="user-role" class="form-select" style="padding-left: var(--space-4);" required>
+              ${roles.map(r => `<option value="${r}">${r}</option>`).join('')}
+            </select>
+          </div>
+          <div style="display: flex; gap: var(--space-3); justify-content: flex-end;">
+            <button type="button" class="btn btn-ghost" id="btn-cancel-usuario">Cancelar</button>
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}
+
+// ── Vista CRUD Genérica para Administración ──
+export function renderAdminCrudView(config, data) {
+  const { title, icon, columns } = config;
+  const tableColumns = columns.filter(c => c.type !== 'textarea');
+
+  return `
+    <div class="data-table-container animate-fade-in">
+      <div class="table-header">
+        <h3>${icon} ${title}</h3>
+        <div class="table-actions">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Buscar..." id="search-admin-crud" />
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-add-admin-crud">+ Nuevo Registro</button>
+        </div>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="data-table" id="table-admin-crud">
+          <thead>
+            <tr>
+              <th style="width: 50px;">#</th>
+              ${tableColumns.map(col => `<th>${col.label}</th>`).join('')}
+              <th>Estado</th>
+              <th style="width: 100px;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.length === 0 ? `
+              <tr>
+                <td colspan="${tableColumns.length + 3}" style="text-align: center; padding: var(--space-8); color: var(--text-tertiary);">
+                  <div style="font-size: 2em; margin-bottom: var(--space-2);">📭</div>
+                  No hay registros. Haz clic en "+ Nuevo Registro" para agregar uno.
+                </td>
+              </tr>
+            ` : data.map((row, idx) => `
+              <tr data-id="${row.id}">
+                <td style="color: var(--text-tertiary); font-size: 0.85em;">${idx + 1}</td>
+                ${tableColumns.map(col => {
+    let val = row[col.key] ?? '';
+    if (col.type === 'number' && val !== '') {
+      val = new Intl.NumberFormat('es-AR').format(Number(val));
+    }
+    if (col.type === 'date' && val) {
+      try { val = new Date(val).toLocaleDateString('es-AR'); } catch (e) { }
+    }
+    const isFirst = col === tableColumns[0];
+    return `<td${isFirst ? ' style="font-weight: 600;"' : ''}>${val}</td>`;
+  }).join('')}
+                <td>
+                  <span class="status-badge ${row.status === 'active' ? 'active' : 'inactive'}">
+                    <span class="status-dot"></span>
+                    ${row.status === 'active' ? 'Activo' : 'Inactivo'}
+                  </span>
+                </td>
+                <td>
+                  <div style="display: flex; gap: var(--space-2);">
+                    <button class="btn btn-sm btn-ghost btn-edit-admin-crud" data-id="${row.id}" title="Editar">✏️</button>
+                    <button class="btn btn-sm btn-ghost btn-delete-admin-crud" data-id="${row.id}" title="Eliminar" style="color: var(--color-error);">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      ${data.length > 0 ? `
+        <div style="padding: var(--space-3) var(--space-4); border-top: 1px solid var(--border-subtle); color: var(--text-tertiary); font-size: 0.85em; display: flex; justify-content: space-between;">
+          <span>Total: ${data.length} registros</span>
+          <span>${icon} ${title}</span>
+        </div>
+      ` : ''}
+    </div>
+
+    <!-- Modal Formulario Admin CRUD -->
+    <div id="admin-crud-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+      <div style="background: var(--bg-secondary); border-radius: 16px; padding: var(--space-8); max-width: 560px; width: 92%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid var(--border-subtle); max-height: 85vh; overflow-y: auto;">
+        <h3 id="admin-crud-modal-title" style="font-family: 'Outfit'; margin-bottom: var(--space-6); color: var(--text-primary); display: flex; align-items: center; gap: var(--space-2);">
+          ${icon} Nuevo Registro
+        </h3>
+        <form id="form-admin-crud" autocomplete="off">
+          <input type="hidden" id="admin-crud-edit-id" value="">
+          ${columns.map(col => {
+    if (col.type === 'textarea') {
+      return `
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                  <label class="form-label" for="admin-crud-${col.key}">${col.label}</label>
+                  <textarea id="admin-crud-${col.key}" class="form-input" style="padding-left: var(--space-4); min-height: 80px; resize: vertical;" placeholder="${col.label}"${col.required ? ' required' : ''}></textarea>
+                </div>
+              `;
+    }
+    if (col.type === 'select') {
+      return `
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                  <label class="form-label" for="admin-crud-${col.key}">${col.label}</label>
+                  <select id="admin-crud-${col.key}" class="form-select" style="padding-left: var(--space-4);"${col.required ? ' required' : ''}>
+                    ${(col.options || []).map(opt => `<option value="${opt}">${opt.charAt(0).toUpperCase() + opt.slice(1).replace(/_/g, ' ')}</option>`).join('')}
+                  </select>
+                </div>
+              `;
+    }
+    return `
+              <div class="form-group" style="margin-bottom: var(--space-4);">
+                <label class="form-label" for="admin-crud-${col.key}">${col.label}</label>
+                <input type="${col.type === 'number' ? 'number' : col.type === 'date' ? 'date' : col.type === 'email' ? 'email' : 'text'}" 
+                  id="admin-crud-${col.key}" 
+                  class="form-input" 
+                  style="padding-left: var(--space-4);" 
+                  placeholder="${col.label}"
+                  ${col.type === 'number' ? 'step="any"' : ''}
+                  ${col.required ? 'required' : ''} />
+              </div>
+            `;
+  }).join('')}
+          <div style="display: flex; gap: var(--space-3); justify-content: flex-end; margin-top: var(--space-6);">
+            <button type="button" class="btn btn-ghost" id="btn-cancel-admin-crud">Cancelar</button>
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}
+
+// ── Gastos View ──
+export function renderGastosView() {
+  return `
+    <div class="animate-fade-in">
+        <div class="sofia-filters" style="margin-bottom: var(--space-6);">
+            <div class="filter-group">
+                <label class="form-label">PERIODO</label>
+                <select class="form-select sofia-filter-select">
+                    <option>Ciclo Actual (2025-2026)</option>
+                    <option>2024-2025</option>
+                    <option>2023-2024</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="form-label">FINCA</label>
+                <select class="form-select sofia-filter-select">
+                    <option>Todas</option>
+                    <option>El Espejo</option>
+                    <option>Fincas Viejas</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="form-label">CATEGORÍA</label>
+                <select class="form-select sofia-filter-select">
+                    <option>Todas</option>
+                    <option>Mano de Obra</option>
+                    <option>Insumos</option>
+                    <option>Energía/Riego</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); gap: var(--space-6); margin-bottom: var(--space-8);">
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon green">💸</div>
+                </div>
+                <div class="metric-value">$0.00</div>
+                <div class="metric-label">TOTAL GASTOS ACUMULADOS</div>
+                <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">+0% vs ciclo anterior</p>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon amber">👤</div>
+                </div>
+                <div class="metric-value">$0.00</div>
+                <div class="metric-label">MANO DE OBRA (DIRECTA)</div>
+                <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Gastos de personal en finca</p>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon purple">📦</div>
+                </div>
+                <div class="metric-value">$0.00</div>
+                <div class="metric-label">INSUMOS Y PRODUCTOS</div>
+                <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Fertilizantes y fitosanitarios</p>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon blue">⚡</div>
+                </div>
+                <div class="metric-value">$0.00</div>
+                <div class="metric-label">OTROS (ENERGÍA/RIEGO)</div>
+                <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">Gasoil, Energía y Mantenimiento</p>
+            </div>
+        </div>
+
+        <div class="charts-row" style="margin-bottom: var(--space-8);">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <span class="chart-title">Evolución Mensual de Gastos</span>
+                </div>
+                <div style="height: 300px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); font-style: italic; background: rgba(0,0,0,0.05); border-radius: 8px;">
+                    [ Gráfico de Gastos Históricos ]
+                </div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-header">
+                    <span class="chart-title">Distribución por Finca</span>
+                </div>
+                <div style="height: 300px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); font-style: italic; background: rgba(0,0,0,0.05); border-radius: 8px;">
+                    [ Distribución de Gastos ]
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+// ── Secaderos View ──
+export function renderSecaderosView() {
+  return `
+    <div class="animate-fade-in">
+        <div class="sofia-filters" style="margin-bottom: var(--space-6);">
+            <div class="filter-group">
+                <label class="form-label">COSECHA</label>
+                <select class="form-select sofia-filter-select">
+                    <option>2025-2026</option>
+                    <option>2024-2025</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="form-label">ESTABLECIMIENTO</label>
+                <select class="form-select sofia-filter-select">
+                    <option>Todos</option>
+                    <option>Secadero El Espejo</option>
+                    <option>Secadero Caucete</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); gap: var(--space-6); margin-bottom: var(--space-8);">
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon green">🚛</div>
+                </div>
+                <div class="metric-value">0 <small style="font-size: 0.5em;">kg</small></div>
+                <div class="metric-label">kg FRESCOS RECIBIDOS</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon purple">📦</div>
+                </div>
+                <div class="metric-value">0 <small style="font-size: 0.5em;">kg</small></div>
+                <div class="metric-label">kg PASA PRODUCIDA</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon amber">⚖️</div>
+                </div>
+                <div class="metric-value">0.00</div>
+                <div class="metric-label">RELACIÓN (Kg F / Kg P)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <div class="metric-card-icon blue">🏠</div>
+                </div>
+                <div class="metric-value">0%</div>
+                <div class="metric-label">OCUPACIÓN DE PLAYONES</div>
+            </div>
+        </div>
+
+        <div class="chart-container" style="margin-bottom: var(--space-8);">
+            <div class="chart-header">
+                <span class="chart-title">Ingreso de Materia Prima por Día</span>
+            </div>
+            <div style="height: 350px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); font-style: italic; background: rgba(0,0,0,0.05); border-radius: 8px;">
+                [ Gráfico de Recepción ]
+            </div>
+        </div>
+
+        <div class="data-table-container">
+            <div class="table-header">
+                <h3>Detalle de Partidas en Secado</h3>
+            </div>
+            <div style="padding: var(--space-10); text-align: center; color: var(--text-tertiary);">
+                No hay ingresos registrados en el periodo seleccionado.
+            </div>
+        </div>
+    </div>
+    `;
 }
 
