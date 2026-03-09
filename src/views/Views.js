@@ -2845,3 +2845,149 @@ export function renderSecaderosView() {
     `;
 }
 
+// ── Gestión de Usuarios View ──
+export function renderUsuariosView(users, roles) {
+  const pendingUsers = users.filter(u => u.pending && !u.active);
+  const regularUsers = users.filter(u => !u.pending || u.active);
+
+  return `
+    ${pendingUsers.length > 0 ? `
+    <div class="data-table-container animate-fade-in" style="margin-bottom: var(--space-6); border: 1px solid rgba(245,158,11,0.3);">
+      <div class="table-header" style="background: rgba(245,158,11,0.08);">
+        <h3 style="display: flex; align-items: center; gap: var(--space-3);">
+          ⏳ Solicitudes Pendientes
+          <span style="background: #f59e0b; color: #000; font-size: 0.7em; padding: 2px 8px; border-radius: 12px; font-weight: 700;">${pendingUsers.length}</span>
+        </h3>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Avatar</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Fecha Solicitud</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pendingUsers.map(u => `
+            <tr data-id="${u.id}">
+              <td>
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8em; color: white;">
+                  ${u.avatar}
+                </div>
+              </td>
+              <td><strong>${u.name}</strong></td>
+              <td><code style="color: var(--color-primary-400); font-size: 0.9em;">${u.email}</code></td>
+              <td style="font-size: 0.85em; color: var(--text-tertiary);">${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString('es-AR') : '—'}</td>
+              <td>
+                <div style="display: flex; gap: var(--space-2);">
+                  <button class="btn btn-sm btn-approve-usuario" data-id="${u.id}" style="background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); padding: 4px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+                    ✅ Aprobar
+                  </button>
+                  <button class="btn btn-sm btn-reject-usuario" data-id="${u.id}" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 4px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+                    ❌ Rechazar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    ` : ''}
+
+    <div class="data-table-container animate-fade-in">
+      <div class="table-header">
+        <h3>👥 Gestión de Usuarios</h3>
+        <div class="table-actions">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Buscar usuario..." id="search-usuarios" />
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-add-usuario">+ Nuevo Usuario</button>
+        </div>
+      </div>
+      <table class="data-table" id="table-usuarios">
+        <thead>
+          <tr>
+            <th>Avatar</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${regularUsers.map(u => `
+            <tr data-id="${u.id}">
+              <td>
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8em; color: white;">
+                  ${u.avatar}
+                </div>
+              </td>
+              <td><strong>${u.name}</strong></td>
+              <td><code style="color: var(--color-primary-400); font-size: 0.9em;">${u.email}</code></td>
+              <td>
+                <span style="padding: 4px 10px; border-radius: 12px; font-size: 0.8em; font-weight: 600;
+                  background: ${u.role === 'Administrador' ? 'rgba(239, 68, 68, 0.15); color: #ef4444' :
+      u.role === 'Ingeniero' ? 'rgba(59, 130, 246, 0.15); color: #3b82f6' :
+        u.role === 'Sub-Admin' ? 'rgba(168, 85, 247, 0.15); color: #a855f7' :
+          'rgba(74, 222, 128, 0.15); color: #4ade80'};">
+                  ${u.role}
+                </span>
+              </td>
+              <td>
+                <span class="status-badge ${u.active ? 'active' : 'inactive'}">
+                  <span class="status-dot"></span>
+                  ${u.active ? 'Activo' : 'Inactivo'}
+                </span>
+              </td>
+              <td>
+                <div style="display: flex; gap: var(--space-2);">
+                  <button class="btn btn-sm btn-ghost btn-edit-usuario" data-id="${u.id}" title="Editar">✏️</button>
+                  <button class="btn btn-sm btn-ghost btn-delete-usuario" data-id="${u.id}" title="${u.active ? 'Desactivar' : 'Activar'}" style="color: ${u.active ? 'var(--color-error)' : 'var(--color-success)'};">
+                    ${u.active ? '🗑️' : '✅'}
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal Formulario Usuario -->
+    <div id="user-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+      <div style="background: var(--bg-secondary); border-radius: 16px; padding: var(--space-8); max-width: 480px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid var(--border-subtle);">
+        <h3 id="user-modal-title" style="font-family: 'Outfit'; margin-bottom: var(--space-6); color: var(--text-primary);">Nuevo Usuario</h3>
+        <form id="form-usuario" autocomplete="off">
+          <input type="hidden" id="user-edit-id" value="">
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" for="user-name">Nombre Completo</label>
+            <input type="text" id="user-name" class="form-input" style="padding-left: var(--space-4);" placeholder="Ej: Juan Pérez" required />
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" for="user-email">Email</label>
+            <input type="email" id="user-email" class="form-input" style="padding-left: var(--space-4);" placeholder="usuario@naturalfood.com" required />
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" for="user-password">Contraseña</label>
+            <input type="text" id="user-password" class="form-input" style="padding-left: var(--space-4);" placeholder="••••••••" />
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-6);">
+            <label class="form-label" for="user-role">Rol</label>
+            <select id="user-role" class="form-select" style="padding-left: var(--space-4);" required>
+              ${roles.map(r => `<option value="${r}">${r}</option>`).join('')}
+            </select>
+          </div>
+          <div style="display: flex; gap: var(--space-3); justify-content: flex-end;">
+            <button type="button" class="btn btn-ghost" id="btn-cancel-usuario">Cancelar</button>
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}
